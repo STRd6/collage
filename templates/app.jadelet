@@ -1,6 +1,8 @@
 app
   tools
-  = @screenElement
+  workspace(drop=@workspaceDrop dragover=@workspaceDragover)
+    = @screenElement
   materials
+    - dragstart = @materialDrag
     - @imageUrls.forEach (url) ->
-      img(src=url)
+      img(src=url draggable=true dragstart=dragstart)
