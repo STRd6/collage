@@ -14,34 +14,54 @@
     },
     "main.coffee": {
       "path": "main.coffee",
-      "content": "style = document.createElement \"style\"\nstyle.innerHTML = require \"./style\"\ndocument.head.appendChild style\n\nTemplate = require \"./templates/app\"\n\ndocument.body.appendChild Template({})\n",
+      "content": "style = document.createElement \"style\"\nstyle.innerHTML = require \"./style\"\ndocument.head.appendChild style\n\nTemplate = require \"./templates/app\"\n\nTouchScreen = require \"./lib/touchscreen\"\ntouchScreen = TouchScreen document.createElement \"workspace\"\n\ntouchScreen.on \"touch\", (e) -> console.log e\n\ndocument.body.appendChild Template\n  screenElement: touchScreen.element()\n",
       "mode": "100644"
     },
     "templates/app.jadelet": {
       "path": "templates/app.jadelet",
-      "content": "app\n  tools\n  workspace\n  materials\n",
+      "content": "app\n  tools\n  = @screenElement\n  materials\n",
       "mode": "100644"
     },
     "style.styl": {
       "path": "style.styl",
-      "content": "*\n  box-sizing: border-box\n\nbody, html\n  height: 100%\n\nbody\n  margin: 0\n\napp\n  background-color: pink\n  display: flex\n  height: 100%\n\n  & > tools, & > materials, & > workspace\n    display: block\n    flex-grow: 0\n\n  & > workspace\n    flex-grow: 1\n\n  & > tools\n    background-color: olive\n    width: 100px\n\n  & > materials\n    background-color: yellow\n    width: 200px\n",
+      "content": "*\n  box-sizing: border-box\n\nbody, html\n  height: 100%\n\nbody\n  margin: 0\n\napp\n  background-color: pink\n  display: flex\n  height: 100%\n\n  & > tools, & > materials, & > workspace\n    display: block\n    flex-grow: 0\n\n  & > workspace\n    background-color: powderblue\n    flex-grow: 1\n\n  & > tools\n    background-color: olive\n    width: 100px\n\n  & > materials\n    background-color: yellow\n    width: 200px\n",
+      "mode": "100644"
+    },
+    "lib/touchscreen.coffee.md": {
+      "path": "lib/touchscreen.coffee.md",
+      "content": "Touch Screen\n============\n\nA screen you can TOUCH!\n\nImplementation\n--------------\n\nAn element that reports mouse and touch events. The events\nare scaled to the size of the element with [0, 0] being in the top\nleft and a number close to 1 being in the bottom right.\n\nWe track movement outside of the element so the positions are not\nclamped and return their true value if the element were to extend.\nThis means that it is possible to receive negative numbers and\nnumbers >= 1 for positions.\n\n    Bindable = require \"bindable\"\n\n    module.exports = (element) ->\n      self = Bindable()\n\n      element ?= document.createElement \"div\"\n      self.element = ->\n        element\n\n      # Keep track of if the mouse is active in the element\n      active = false\n\nWhen we click within the element set the value for the position we clicked at.\n\n      listen element, \"mousedown\", (e) ->\n        active = true\n\n        self.trigger \"touch\", localPosition(e)\n\nHandle touch starts\n\n      listen element, \"touchstart\", (e) ->\n        # Global `event`\n        processTouches event, (touch) ->\n          self.trigger \"touch\", localPosition(touch)\n\nWhen the mouse moves trigger an event with the current position.\n\n      listen element, \"mousemove\", (e) ->\n        if active\n          self.trigger \"move\", localPosition(e)\n\nHandle moves outside of the element if the action was initiated within the element.\n\n      listen document, \"mousemove\", (e) ->\n        if active\n          self.trigger \"move\", localPosition(e)\n\nHandle touch moves.\n\n      listen element, \"touchmove\", (e) ->\n        # Global `event`\n        processTouches event, (touch) ->\n          self.trigger \"move\", localPosition(touch)\n\nHandle releases.\n\n      listen element, \"mouseup\", (e) ->\n        self.trigger \"release\", localPosition(e)\n        active = false\n\n        return\n\nHandle touch ends.\n\n      listen element, \"touchend\", (e) ->\n        # Global `event`\n        processTouches event, (touch) ->\n          self.trigger \"release\", localPosition(touch)\n\nWhenever the mouse button is released from anywhere, deactivate. Be sure to\ntrigger the release event if the mousedown started within the element.\n\n      listen document, \"mouseup\", (e) ->\n        if active\n          self.trigger \"release\", localPosition(e)\n\n        active = false\n\n        return\n\nHelpers\n-------\n\nProcess touches\n\n      processTouches = (event, fn) ->\n        event.preventDefault()\n\n        if event.type is \"touchend\"\n          # touchend doesn't have any touches, but does have changed touches\n          touches = event.changedTouches\n        else\n          touches = event.touches\n\n        self.debug? Array::map.call touches, ({identifier, pageX, pageY}) ->\n          \"[#{identifier}: #{pageX}, #{pageY} (#{event.type})]\\n\"\n\n        Array::forEach.call touches, fn\n\nLocal event position.\n\n      localPosition = (e) ->\n        rect = element.getBoundingClientRect()\n\n        point =\n          x: (e.pageX - rect.left) / rect.width\n          y: (e.pageY - rect.top) / rect.height\n\n        # Add mouse into touch identifiers as 0\n        point.identifier = (e.identifier + 1) or 0\n\n        return point\n\nReturn self\n\n      return self\n\nAttach an event listener to an element\n\n    listen = (element, event, handler) ->\n      element.addEventListener(event, handler, false)\n",
+      "mode": "100644"
+    },
+    "pixie.cson": {
+      "path": "pixie.cson",
+      "content": "dependencies:\n  bindable: \"distri/bindable:v0.2.0\"\n",
       "mode": "100644"
     }
   },
   "distribution": {
     "main": {
       "path": "main",
-      "content": "(function() {\n  var Template, style;\n\n  style = document.createElement(\"style\");\n\n  style.innerHTML = require(\"./style\");\n\n  document.head.appendChild(style);\n\n  Template = require(\"./templates/app\");\n\n  document.body.appendChild(Template({}));\n\n}).call(this);\n",
+      "content": "(function() {\n  var Template, TouchScreen, style, touchScreen;\n\n  style = document.createElement(\"style\");\n\n  style.innerHTML = require(\"./style\");\n\n  document.head.appendChild(style);\n\n  Template = require(\"./templates/app\");\n\n  TouchScreen = require(\"./lib/touchscreen\");\n\n  touchScreen = TouchScreen(document.createElement(\"workspace\"));\n\n  touchScreen.on(\"touch\", function(e) {\n    return console.log(e);\n  });\n\n  document.body.appendChild(Template({\n    screenElement: touchScreen.element()\n  }));\n\n}).call(this);\n",
       "type": "blob"
     },
     "templates/app": {
       "path": "templates/app",
-      "content": "module.exports = function(data) {\n  \"use strict\";\n  return (function() {\n    var __root;\n    __root = require(\"/lib/hamlet-runtime\")(this);\n    __root.buffer(__root.element(\"app\", this, {}, function(__root) {\n      __root.buffer(__root.element(\"tools\", this, {}, function(__root) {}));\n      __root.buffer(__root.element(\"workspace\", this, {}, function(__root) {}));\n      __root.buffer(__root.element(\"materials\", this, {}, function(__root) {}));\n    }));\n    return __root.root;\n  }).call(data);\n};\n",
+      "content": "module.exports = function(data) {\n  \"use strict\";\n  return (function() {\n    var __root;\n    __root = require(\"/lib/hamlet-runtime\")(this);\n    __root.buffer(__root.element(\"app\", this, {}, function(__root) {\n      __root.buffer(__root.element(\"tools\", this, {}, function(__root) {}));\n      __root.buffer(this.screenElement);\n      __root.buffer(__root.element(\"materials\", this, {}, function(__root) {}));\n    }));\n    return __root.root;\n  }).call(data);\n};\n",
       "type": "blob"
     },
     "style": {
       "path": "style",
-      "content": "module.exports = \"* {\\n  box-sizing: border-box;\\n}\\nbody,\\nhtml {\\n  height: 100%;\\n}\\nbody {\\n  margin: 0;\\n}\\napp {\\n  background-color: #ffc0cb;\\n  display: flex;\\n  height: 100%;\\n}\\napp > tools,\\napp > materials,\\napp > workspace {\\n  display: block;\\n  flex-grow: 0;\\n}\\napp > workspace {\\n  flex-grow: 1;\\n}\\napp > tools {\\n  background-color: #808000;\\n  width: 100px;\\n}\\napp > materials {\\n  background-color: #ff0;\\n  width: 200px;\\n}\\n\";",
+      "content": "module.exports = \"* {\\n  box-sizing: border-box;\\n}\\nbody,\\nhtml {\\n  height: 100%;\\n}\\nbody {\\n  margin: 0;\\n}\\napp {\\n  background-color: #ffc0cb;\\n  display: flex;\\n  height: 100%;\\n}\\napp > tools,\\napp > materials,\\napp > workspace {\\n  display: block;\\n  flex-grow: 0;\\n}\\napp > workspace {\\n  background-color: #b0e0e6;\\n  flex-grow: 1;\\n}\\napp > tools {\\n  background-color: #808000;\\n  width: 100px;\\n}\\napp > materials {\\n  background-color: #ff0;\\n  width: 200px;\\n}\\n\";",
+      "type": "blob"
+    },
+    "lib/touchscreen": {
+      "path": "lib/touchscreen",
+      "content": "(function() {\n  var Bindable, listen;\n\n  Bindable = require(\"bindable\");\n\n  module.exports = function(element) {\n    var active, localPosition, processTouches, self;\n    self = Bindable();\n    if (element == null) {\n      element = document.createElement(\"div\");\n    }\n    self.element = function() {\n      return element;\n    };\n    active = false;\n    listen(element, \"mousedown\", function(e) {\n      active = true;\n      return self.trigger(\"touch\", localPosition(e));\n    });\n    listen(element, \"touchstart\", function(e) {\n      return processTouches(event, function(touch) {\n        return self.trigger(\"touch\", localPosition(touch));\n      });\n    });\n    listen(element, \"mousemove\", function(e) {\n      if (active) {\n        return self.trigger(\"move\", localPosition(e));\n      }\n    });\n    listen(document, \"mousemove\", function(e) {\n      if (active) {\n        return self.trigger(\"move\", localPosition(e));\n      }\n    });\n    listen(element, \"touchmove\", function(e) {\n      return processTouches(event, function(touch) {\n        return self.trigger(\"move\", localPosition(touch));\n      });\n    });\n    listen(element, \"mouseup\", function(e) {\n      self.trigger(\"release\", localPosition(e));\n      active = false;\n    });\n    listen(element, \"touchend\", function(e) {\n      return processTouches(event, function(touch) {\n        return self.trigger(\"release\", localPosition(touch));\n      });\n    });\n    listen(document, \"mouseup\", function(e) {\n      if (active) {\n        self.trigger(\"release\", localPosition(e));\n      }\n      active = false;\n    });\n    processTouches = function(event, fn) {\n      var touches;\n      event.preventDefault();\n      if (event.type === \"touchend\") {\n        touches = event.changedTouches;\n      } else {\n        touches = event.touches;\n      }\n      if (typeof self.debug === \"function\") {\n        self.debug(Array.prototype.map.call(touches, function(_arg) {\n          var identifier, pageX, pageY;\n          identifier = _arg.identifier, pageX = _arg.pageX, pageY = _arg.pageY;\n          return \"[\" + identifier + \": \" + pageX + \", \" + pageY + \" (\" + event.type + \")]\\n\";\n        }));\n      }\n      return Array.prototype.forEach.call(touches, fn);\n    };\n    localPosition = function(e) {\n      var point, rect;\n      rect = element.getBoundingClientRect();\n      point = {\n        x: (e.pageX - rect.left) / rect.width,\n        y: (e.pageY - rect.top) / rect.height\n      };\n      point.identifier = (e.identifier + 1) || 0;\n      return point;\n    };\n    return self;\n  };\n\n  listen = function(element, event, handler) {\n    return element.addEventListener(event, handler, false);\n  };\n\n}).call(this);\n",
+      "type": "blob"
+    },
+    "pixie": {
+      "path": "pixie",
+      "content": "module.exports = {\"dependencies\":{\"bindable\":\"distri/bindable:v0.2.0\"}};",
       "type": "blob"
     },
     "lib/hamlet-runtime": {
@@ -64,5 +84,67 @@
     "url": "https://api.github.com/repos/STRd6/collage",
     "publishBranch": "gh-pages"
   },
-  "dependencies": {}
+  "dependencies": {
+    "bindable": {
+      "source": {
+        "LICENSE": {
+          "path": "LICENSE",
+          "content": "The MIT License (MIT)\n\nCopyright (c) 2014 distri\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of\nthis software and associated documentation files (the \"Software\"), to deal in\nthe Software without restriction, including without limitation the rights to\nuse, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of\nthe Software, and to permit persons to whom the Software is furnished to do so,\nsubject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS\nFOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR\nCOPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER\nIN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN\nCONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n",
+          "mode": "100644",
+          "type": "blob"
+        },
+        "README.coffee.md": {
+          "path": "README.coffee.md",
+          "content": "Bindable\n========\n\nAdd event binding to objects.\n\n>     bindable = Bindable()\n>     bindable.on \"greet\", ->\n>       console.log \"yo!\"\n>     bindable.trigger \"greet\"\n>     #=> \"yo!\" is printed to log\n\nUse as a mixin.\n\n>    self.include Bindable\n\n    module.exports = (I={}, self={}) ->\n      eventCallbacks = {}\n\nAdds a function as an event listener.\n\nThis will call `coolEventHandler` after `yourObject.trigger \"someCustomEvent\"`\nis called.\n\n>     yourObject.on \"someCustomEvent\", coolEventHandler\n\nHandlers can be attached to namespaces as well. The namespaces are only used\nfor finer control of targeting event removal. For example if you are making a\ncustom drawing system you could unbind `\".Drawable\"` events and add your own.\n\n>     yourObject.on \"\"\n\n      self.on = (namespacedEvent, callback) ->\n        [event, namespace] = namespacedEvent.split(\".\")\n\n        # HACK: Here we annotate the callback function with namespace metadata\n        # This will probably lead to some strange edge cases, but should work fine\n        # for simple cases.\n        if namespace\n          callback.__PIXIE ||= {}\n          callback.__PIXIE[namespace] = true\n\n        eventCallbacks[event] ||= []\n        eventCallbacks[event].push(callback)\n\n        return self\n\nRemoves a specific event listener, or all event listeners if\nno specific listener is given.\n\nRemoves the handler coolEventHandler from the event `\"someCustomEvent\"` while\nleaving the other events intact.\n\n>     yourObject.off \"someCustomEvent\", coolEventHandler\n\nRemoves all handlers attached to `\"anotherCustomEvent\"`\n\n>     yourObject.off \"anotherCustomEvent\"\n\nRemove all handlers from the `\".Drawable\" namespace`\n\n>     yourObject.off \".Drawable\"\n\n      self.off = (namespacedEvent, callback) ->\n        [event, namespace] = namespacedEvent.split(\".\")\n\n        if event\n          eventCallbacks[event] ||= []\n\n          if namespace\n            # Select only the callbacks that do not have this namespace metadata\n            eventCallbacks[event] = eventCallbacks.filter (callback) ->\n              !callback.__PIXIE?[namespace]?\n\n          else\n            if callback\n              remove eventCallbacks[event], callback\n            else\n              eventCallbacks[event] = []\n        else if namespace\n          # No event given\n          # Select only the callbacks that do not have this namespace metadata\n          # for any events bound\n          for key, callbacks of eventCallbacks\n            eventCallbacks[key] = callbacks.filter (callback) ->\n              !callback.__PIXIE?[namespace]?\n\n        return self\n\nCalls all listeners attached to the specified event.\n\n>     # calls each event handler bound to \"someCustomEvent\"\n>     yourObject.trigger \"someCustomEvent\"\n\nAdditional parameters can be passed to the handlers.\n\n>     yourObject.trigger \"someEvent\", \"hello\", \"anotherParameter\"\n\n      self.trigger = (event, parameters...) ->\n        callbacks = eventCallbacks[event]\n\n        if callbacks\n          callbacks.forEach (callback) ->\n            callback.apply(self, parameters)\n\n        return self\n\n      return self\n\nHelpers\n-------\n\nRemove a value from an array.\n\n    remove = (array, value) ->\n      index = array.indexOf(value)\n\n      if index >= 0\n        array.splice(index, 1)[0]\n",
+          "mode": "100644",
+          "type": "blob"
+        },
+        "pixie.cson": {
+          "path": "pixie.cson",
+          "content": "entryPoint: \"README\"\nversion: \"0.2.0\"\n",
+          "mode": "100644",
+          "type": "blob"
+        },
+        "test/bindable.coffee": {
+          "path": "test/bindable.coffee",
+          "content": "test = it\nok = assert\nequal = assert.equal\n\nBindable = require \"../README\"\n\ndescribe \"Bindable\", ->\n\n  test \"#bind and #trigger\", ->\n    o = Bindable()\n\n    o.on(\"test\", -> ok true)\n\n    o.trigger(\"test\")\n\n  test \"Multiple bindings\", ->\n    o = Bindable()\n\n    o.on(\"test\", -> ok true)\n    o.on(\"test\", -> ok true)\n\n    o.trigger(\"test\")\n\n  test \"#trigger arguments\", ->\n    o = Bindable()\n\n    param1 = \"the message\"\n    param2 = 3\n\n    o.on \"test\", (p1, p2) ->\n      equal(p1, param1)\n      equal(p2, param2)\n\n    o.trigger \"test\", param1, param2\n\n  test \"#unbind\", ->\n    o = Bindable()\n\n    callback = ->\n      ok false\n\n    o.on \"test\", callback\n    # Unbind specific event\n    o.off \"test\", callback\n    o.trigger \"test\"\n\n    o.on \"test\", callback\n    # Unbind all events\n    o.off \"test\"\n    o.trigger \"test\"\n\n  test \"#trigger namespace\", ->\n    o = Bindable()\n    o.on \"test.TestNamespace\", ->\n      ok true\n\n    o.trigger \"test\"\n\n    o.off \".TestNamespace\"\n    o.trigger \"test\"\n\n  test \"#unbind namespaced\", ->\n    o = Bindable()\n\n    o.on \"test.TestNamespace\", ->\n      ok true\n\n    o.trigger \"test\"\n\n    o.off \".TestNamespace\", ->\n    o.trigger \"test\"\n",
+          "mode": "100644",
+          "type": "blob"
+        }
+      },
+      "distribution": {
+        "README": {
+          "path": "README",
+          "content": "(function() {\n  var remove,\n    __slice = [].slice;\n\n  module.exports = function(I, self) {\n    var eventCallbacks;\n    if (I == null) {\n      I = {};\n    }\n    if (self == null) {\n      self = {};\n    }\n    eventCallbacks = {};\n    self.on = function(namespacedEvent, callback) {\n      var event, namespace, _ref;\n      _ref = namespacedEvent.split(\".\"), event = _ref[0], namespace = _ref[1];\n      if (namespace) {\n        callback.__PIXIE || (callback.__PIXIE = {});\n        callback.__PIXIE[namespace] = true;\n      }\n      eventCallbacks[event] || (eventCallbacks[event] = []);\n      eventCallbacks[event].push(callback);\n      return self;\n    };\n    self.off = function(namespacedEvent, callback) {\n      var callbacks, event, key, namespace, _ref;\n      _ref = namespacedEvent.split(\".\"), event = _ref[0], namespace = _ref[1];\n      if (event) {\n        eventCallbacks[event] || (eventCallbacks[event] = []);\n        if (namespace) {\n          eventCallbacks[event] = eventCallbacks.filter(function(callback) {\n            var _ref1;\n            return ((_ref1 = callback.__PIXIE) != null ? _ref1[namespace] : void 0) == null;\n          });\n        } else {\n          if (callback) {\n            remove(eventCallbacks[event], callback);\n          } else {\n            eventCallbacks[event] = [];\n          }\n        }\n      } else if (namespace) {\n        for (key in eventCallbacks) {\n          callbacks = eventCallbacks[key];\n          eventCallbacks[key] = callbacks.filter(function(callback) {\n            var _ref1;\n            return ((_ref1 = callback.__PIXIE) != null ? _ref1[namespace] : void 0) == null;\n          });\n        }\n      }\n      return self;\n    };\n    self.trigger = function() {\n      var callbacks, event, parameters;\n      event = arguments[0], parameters = 2 <= arguments.length ? __slice.call(arguments, 1) : [];\n      callbacks = eventCallbacks[event];\n      if (callbacks) {\n        callbacks.forEach(function(callback) {\n          return callback.apply(self, parameters);\n        });\n      }\n      return self;\n    };\n    return self;\n  };\n\n  remove = function(array, value) {\n    var index;\n    index = array.indexOf(value);\n    if (index >= 0) {\n      return array.splice(index, 1)[0];\n    }\n  };\n\n}).call(this);\n",
+          "type": "blob"
+        },
+        "pixie": {
+          "path": "pixie",
+          "content": "module.exports = {\"entryPoint\":\"README\",\"version\":\"0.2.0\"};",
+          "type": "blob"
+        },
+        "test/bindable": {
+          "path": "test/bindable",
+          "content": "(function() {\n  var Bindable, equal, ok, test;\n\n  test = it;\n\n  ok = assert;\n\n  equal = assert.equal;\n\n  Bindable = require(\"../README\");\n\n  describe(\"Bindable\", function() {\n    test(\"#bind and #trigger\", function() {\n      var o;\n      o = Bindable();\n      o.on(\"test\", function() {\n        return ok(true);\n      });\n      return o.trigger(\"test\");\n    });\n    test(\"Multiple bindings\", function() {\n      var o;\n      o = Bindable();\n      o.on(\"test\", function() {\n        return ok(true);\n      });\n      o.on(\"test\", function() {\n        return ok(true);\n      });\n      return o.trigger(\"test\");\n    });\n    test(\"#trigger arguments\", function() {\n      var o, param1, param2;\n      o = Bindable();\n      param1 = \"the message\";\n      param2 = 3;\n      o.on(\"test\", function(p1, p2) {\n        equal(p1, param1);\n        return equal(p2, param2);\n      });\n      return o.trigger(\"test\", param1, param2);\n    });\n    test(\"#unbind\", function() {\n      var callback, o;\n      o = Bindable();\n      callback = function() {\n        return ok(false);\n      };\n      o.on(\"test\", callback);\n      o.off(\"test\", callback);\n      o.trigger(\"test\");\n      o.on(\"test\", callback);\n      o.off(\"test\");\n      return o.trigger(\"test\");\n    });\n    test(\"#trigger namespace\", function() {\n      var o;\n      o = Bindable();\n      o.on(\"test.TestNamespace\", function() {\n        return ok(true);\n      });\n      o.trigger(\"test\");\n      o.off(\".TestNamespace\");\n      return o.trigger(\"test\");\n    });\n    return test(\"#unbind namespaced\", function() {\n      var o;\n      o = Bindable();\n      o.on(\"test.TestNamespace\", function() {\n        return ok(true);\n      });\n      o.trigger(\"test\");\n      o.off(\".TestNamespace\", function() {});\n      return o.trigger(\"test\");\n    });\n  });\n\n}).call(this);\n",
+          "type": "blob"
+        }
+      },
+      "progenitor": {
+        "url": "https://danielx.net/editor/"
+      },
+      "version": "0.2.0",
+      "entryPoint": "README",
+      "repository": {
+        "branch": "v0.2.0",
+        "default_branch": "master",
+        "full_name": "distri/bindable",
+        "homepage": null,
+        "description": "Event binding",
+        "html_url": "https://github.com/distri/bindable",
+        "url": "https://api.github.com/repos/distri/bindable",
+        "publishBranch": "gh-pages"
+      },
+      "dependencies": {}
+    }
+  }
 }
