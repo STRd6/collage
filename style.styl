@@ -1,0 +1,28 @@
+*
+  box-sizing: border-box
+
+body, html
+  height: 100%
+
+body
+  margin: 0
+
+app
+  background-color: pink
+  display: flex
+  height: 100%
+
+  & > tools, & > materials, & > workspace
+    display: block
+    flex-grow: 0
+
+  & > workspace
+    flex-grow: 1
+
+  & > tools
+    background-color: olive
+    width: 100px
+
+  & > materials
+    background-color: yellow
+    width: 200px
