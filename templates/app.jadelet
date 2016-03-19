@@ -2,3 +2,5 @@ app
   tools
   = @screenElement
   materials
+    - @imageUrls.forEach (url) ->
+      img(src=url)
