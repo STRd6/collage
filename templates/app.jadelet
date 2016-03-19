@@ -1,6 +1,6 @@
 app
   tools
-  workspace(drop=@workspaceDrop dragover=@workspaceDragover)
+  workspace(drop=@workspaceDrop dragover=@workspaceDragover mousedown=@mousedown mousemove=@mousemove)
     = @screenElement
   materials
     - dragstart = @materialDrag
