@@ -1,8 +1,8 @@
 app
   tools
+    button(click=@render) Render
   workspace(drop=@workspaceDrop dragover=@workspaceDragover mousedown=@mousedown mousemove=@mousemove)
     = @screenElement
-  materials
-    - dragstart = @materialDrag
-    - @imageUrls.forEach (url) ->
-      img(src=url draggable=true dragstart=dragstart)
+  materials(dragstart=@materialDrag)
+    = @images
+  canvas

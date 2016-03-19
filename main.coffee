@@ -2,6 +2,11 @@ style = document.createElement "style"
 style.innerHTML = require "./style"
 document.head.appendChild style
 
+Renderer = require "./renderer"
+renderer = Renderer()
+
+Matrix = require "matrix"
+
 Template = require "./templates/app"
 
 # TouchScreen = require "./lib/touchscreen"
@@ -10,22 +15,42 @@ Template = require "./templates/app"
 
 activeElement = null
 offset = null
+workspace = null
+context = null
+
+imageUrls = [
+  "https://0.pixiecdn.com/sprites/138612/original.png"
+  "https://1.pixiecdn.com/sprites/141985/original."
+  "https://3.pixiecdn.com/sprites/138119/original.png"
+  "https://2.pixiecdn.com/sprites/137922/original.png"
+]
 
 document.addEventListener "mouseup", ->
   activeElement = null
 
 document.body.appendChild Template
   screenElement: [] #touchScreen.element()
-  imageUrls: [
-    "https://0.pixiecdn.com/sprites/138612/original.png"
-    "https://1.pixiecdn.com/sprites/141985/original."
-    "https://3.pixiecdn.com/sprites/138119/original.png"
-    "https://2.pixiecdn.com/sprites/137922/original.png"
-  ]
+
+  images: ->
+    imageUrls.map (url) ->
+      img = new Image
+      img.crossOrigin = "Anonymous"
+      img.draggable = true
+      img.src = url + "?o_0"
+
+      return img
+
+  render: ->
+    context.clearRect(0, 0, canvas.width, canvas.height)
+    renderer.render(context, workspace)
+
   materialDrag: (e) ->
-    sourceItem = event.currentTarget
-    
+    sourceItem = event.target
+
+    return unless sourceItem instanceof Image
+
     img = new Image
+    img.crossOrigin = "Anonymous"
     img.src = sourceItem.src
 
     {x, y} = localPosition(e)
@@ -58,7 +83,8 @@ document.body.appendChild Template
     x -= offset.x
     y -= offset.y
 
-    activeElement.style = toTransform(1, 0, 0, 1, x, y)
+    activeElement.matrix = Matrix.translate(x, y)
+    activeElement.style = activeElement.matrix.toCSS3Transform()
 
   workspaceDragover: (e) ->
     e.preventDefault()
@@ -78,15 +104,19 @@ document.body.appendChild Template
     x -= data.offset.x
     y -= data.offset.y
 
-    style = """
-      transform: matrix(1, 0, 0, 1, #{x}, #{y});
-    """
-
     img = new Image
+    img.matrix = Matrix.translate(x, y)
+    img.crossOrigin = "Anonymous"
     img.src = data.src
-    img.style = style
+    img.style = img.matrix.toCSS3Transform()
     e.currentTarget.appendChild img
     # e.currentTarget.insertBefore img, touchScreen.element()
+
+workspace = document.querySelector("workspace")
+canvas = document.querySelector("canvas")
+canvas.height = 600
+
+context = canvas.getContext("2d")
 
 localPosition = (e, scaled=true, current=true) ->
   if current
@@ -106,7 +136,7 @@ localPosition = (e, scaled=true, current=true) ->
     x: x
     y: y
 
-toTransform = (args...) ->
+Matrix::toCSS3Transform ?= ->
   """
-    transform: matrix(#{args.join(",")})
+    transform: #{@toString().toLowerCase()}
   """
