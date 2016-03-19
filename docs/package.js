@@ -199,17 +199,17 @@
     },
     "main.coffee": {
       "path": "main.coffee",
-      "content": "style = document.createElement \"style\"\nstyle.innerHTML = require \"./style\"\ndocument.head.appendChild style\n\nTemplate = require \"./templates/app\"\n\nTouchScreen = require \"./lib/touchscreen\"\ntouchScreen = TouchScreen document.createElement \"workspace\"\n\ntouchScreen.on \"touch\", (e) -> console.log e\n\ndocument.body.appendChild Template\n  screenElement: touchScreen.element()\n",
+      "content": "style = document.createElement \"style\"\nstyle.innerHTML = require \"./style\"\ndocument.head.appendChild style\n\nTemplate = require \"./templates/app\"\n\nTouchScreen = require \"./lib/touchscreen\"\ntouchScreen = TouchScreen document.createElement \"workspace\"\n\ntouchScreen.on \"touch\", (e) -> console.log e\n\ndocument.body.appendChild Template\n  screenElement: touchScreen.element()\n  imageUrls: [\n    \"https://0.pixiecdn.com/sprites/138612/original.png\"\n    \"https://1.pixiecdn.com/sprites/141985/original.\"\n    \"https://3.pixiecdn.com/sprites/138119/original.png\"\n    \"https://2.pixiecdn.com/sprites/137922/original.png\"\n  ]\n",
       "mode": "100644"
     },
     "templates/app.jadelet": {
       "path": "templates/app.jadelet",
-      "content": "app\n  tools\n  = @screenElement\n  materials\n",
+      "content": "app\n  tools\n  = @screenElement\n  materials\n    - @imageUrls.forEach (url) ->\n      img(src=url)\n",
       "mode": "100644"
     },
     "style.styl": {
       "path": "style.styl",
-      "content": "*\n  box-sizing: border-box\n\nbody, html\n  height: 100%\n\nbody\n  margin: 0\n\napp\n  background-color: pink\n  display: flex\n  height: 100%\n\n  & > tools, & > materials, & > workspace\n    display: block\n    flex-grow: 0\n\n  & > workspace\n    background-color: powderblue\n    flex-grow: 1\n\n  & > tools\n    background-color: olive\n    width: 100px\n\n  & > materials\n    background-color: yellow\n    width: 200px\n",
+      "content": "*\n  box-sizing: border-box\n\nbody, html\n  height: 100%\n\nbody\n  margin: 0\n\napp\n  background-color: pink\n  display: flex\n  height: 100%\n\n  & > tools, & > materials, & > workspace\n    display: block\n    flex-grow: 0\n\n  & > workspace\n    background-color: powderblue\n    flex-grow: 1\n\n  & > tools\n    background-color: olive\n    width: 100px\n\n  & > materials\n    background-color: yellow\n    width: 200px\n\n    & > img\n      max-width: 64px\n      height: auto\n",
       "mode": "100644"
     },
     "lib/touchscreen.coffee.md": {
@@ -226,17 +226,17 @@
   "distribution": {
     "main": {
       "path": "main",
-      "content": "(function() {\n  var Template, TouchScreen, style, touchScreen;\n\n  style = document.createElement(\"style\");\n\n  style.innerHTML = require(\"./style\");\n\n  document.head.appendChild(style);\n\n  Template = require(\"./templates/app\");\n\n  TouchScreen = require(\"./lib/touchscreen\");\n\n  touchScreen = TouchScreen(document.createElement(\"workspace\"));\n\n  touchScreen.on(\"touch\", function(e) {\n    return console.log(e);\n  });\n\n  document.body.appendChild(Template({\n    screenElement: touchScreen.element()\n  }));\n\n}).call(this);\n",
+      "content": "(function() {\n  var Template, TouchScreen, style, touchScreen;\n\n  style = document.createElement(\"style\");\n\n  style.innerHTML = require(\"./style\");\n\n  document.head.appendChild(style);\n\n  Template = require(\"./templates/app\");\n\n  TouchScreen = require(\"./lib/touchscreen\");\n\n  touchScreen = TouchScreen(document.createElement(\"workspace\"));\n\n  touchScreen.on(\"touch\", function(e) {\n    return console.log(e);\n  });\n\n  document.body.appendChild(Template({\n    screenElement: touchScreen.element(),\n    imageUrls: [\"https://0.pixiecdn.com/sprites/138612/original.png\", \"https://1.pixiecdn.com/sprites/141985/original.\", \"https://3.pixiecdn.com/sprites/138119/original.png\", \"https://2.pixiecdn.com/sprites/137922/original.png\"]\n  }));\n\n}).call(this);\n",
       "type": "blob"
     },
     "templates/app": {
       "path": "templates/app",
-      "content": "module.exports = function(data) {\n  \"use strict\";\n  return (function() {\n    var __root;\n    __root = require(\"/lib/hamlet-runtime\")(this);\n    __root.buffer(__root.element(\"app\", this, {}, function(__root) {\n      __root.buffer(__root.element(\"tools\", this, {}, function(__root) {}));\n      __root.buffer(this.screenElement);\n      __root.buffer(__root.element(\"materials\", this, {}, function(__root) {}));\n    }));\n    return __root.root;\n  }).call(data);\n};\n",
+      "content": "module.exports = function(data) {\n  \"use strict\";\n  return (function() {\n    var __root;\n    __root = require(\"/lib/hamlet-runtime\")(this);\n    __root.buffer(__root.element(\"app\", this, {}, function(__root) {\n      __root.buffer(__root.element(\"tools\", this, {}, function(__root) {}));\n      __root.buffer(this.screenElement);\n      __root.buffer(__root.element(\"materials\", this, {}, function(__root) {\n        this.imageUrls.forEach(function(url) {\n          return __root.buffer(__root.element(\"img\", this, {\n            \"src\": url\n          }, function(__root) {}));\n        });\n      }));\n    }));\n    return __root.root;\n  }).call(data);\n};\n",
       "type": "blob"
     },
     "style": {
       "path": "style",
-      "content": "module.exports = \"* {\\n  box-sizing: border-box;\\n}\\nbody,\\nhtml {\\n  height: 100%;\\n}\\nbody {\\n  margin: 0;\\n}\\napp {\\n  background-color: #ffc0cb;\\n  display: flex;\\n  height: 100%;\\n}\\napp > tools,\\napp > materials,\\napp > workspace {\\n  display: block;\\n  flex-grow: 0;\\n}\\napp > workspace {\\n  background-color: #b0e0e6;\\n  flex-grow: 1;\\n}\\napp > tools {\\n  background-color: #808000;\\n  width: 100px;\\n}\\napp > materials {\\n  background-color: #ff0;\\n  width: 200px;\\n}\\n\";",
+      "content": "module.exports = \"* {\\n  box-sizing: border-box;\\n}\\nbody,\\nhtml {\\n  height: 100%;\\n}\\nbody {\\n  margin: 0;\\n}\\napp {\\n  background-color: #ffc0cb;\\n  display: flex;\\n  height: 100%;\\n}\\napp > tools,\\napp > materials,\\napp > workspace {\\n  display: block;\\n  flex-grow: 0;\\n}\\napp > workspace {\\n  background-color: #b0e0e6;\\n  flex-grow: 1;\\n}\\napp > tools {\\n  background-color: #808000;\\n  width: 100px;\\n}\\napp > materials {\\n  background-color: #ff0;\\n  width: 200px;\\n}\\napp > materials > img {\\n  max-width: 64px;\\n  height: auto;\\n}\\n\";",
       "type": "blob"
     },
     "lib/touchscreen": {
