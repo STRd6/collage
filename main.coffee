@@ -4,4 +4,10 @@ document.head.appendChild style
 
 Template = require "./templates/app"
 
-document.body.appendChild Template({})
+TouchScreen = require "./lib/touchscreen"
+touchScreen = TouchScreen document.createElement "workspace"
+
+touchScreen.on "touch", (e) -> console.log e
+
+document.body.appendChild Template
+  screenElement: touchScreen.element()
