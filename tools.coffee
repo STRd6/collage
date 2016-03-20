@@ -36,6 +36,13 @@ module.exports = (document) ->
 
     mouseup: (e) ->
 
+  rotate: do ->
+    name: "Rotate"
+    iconURL: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjAiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDI0IDI0IiB4bWw6c3BhY2U9InByZXNlcnZlIj48cG9seWdvbiBwb2ludHM9IjMsMyAyLDEwLjMgOC45LDggIj48L3BvbHlnb24+PHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgZD0iTTUuOCw1LjQgIEM3LjQsMy45LDkuNiwzLDEyLDNjNSwwLDksNCw5LDkiPjwvcGF0aD48cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBzdHJva2UtZGFzaGFycmF5PSIzLDIiIGQ9IiAgTTIxLDEyYzAsNS00LDktOSw5Yy0zLjIsMC01LjktMS42LTcuNS00LjEiPjwvcGF0aD48cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBkPSJNNC4yLDcuNiAgQzUuNyw0LjgsOC42LDMsMTIsM2M1LDAsOSw0LDksOSI+PC9wYXRoPjwvc3ZnPg=="
+    mousedown: ->
+    mousemove: ->
+    mouseup: ->
+
   cut: do ->
     path = []
     active = false

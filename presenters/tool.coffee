@@ -10,3 +10,6 @@ module.exports = (tool, editor) ->
 
     title: ->
       tool.name
+
+    active: ->
+      "active" if editor.activeTool() is tool

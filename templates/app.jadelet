@@ -3,7 +3,6 @@
 
 app
   tools
-    button(click=@render) Render
     - @tools.forEach (tool) ->
       = Tool tool, editor
   workspace

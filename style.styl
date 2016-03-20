@@ -8,7 +8,6 @@ body
   margin: 0
 
 app
-  background-color: pink
   display: flex
   height: 100%
 
@@ -17,7 +16,6 @@ app
     flex-grow: 0
 
   & > workspace
-    background-color: powderblue
     flex-grow: 1
     height: 100%
     position: relative
@@ -40,19 +38,31 @@ app
       pointer-events: none
 
   & > tools
-    background-color: olive
-    width: 100px
-    
+    background-color: #666
     & > tool
+      background-color: #CCC
+      background-position: center
+      background-repeat: no-repeat
       background-size: cover
-      border: 1px solid white
       display: block
-      width: 64px
-      height: 64px
+      width: 48px
+      height: 48px
+      box-sizing: border-box
+      border: 1px solid rgba(0, 0, 0, 0.5)
+      border-top: 1px solid rgba(255, 255, 255, 0.5)
+      border-left: 1px solid rgba(255, 255, 255, 0.5)
+      cursor: pointer
+
+      &.active
+        background-color: #EEE
+
+      &:last-child
+        border-bottom-right-radius: 2px
 
   & > materials
-    background-color: yellow
-    width: 128px
+    background-color: #666
+    border-left: 1px solid #AAA
+    width: 129px
 
     & > img
       max-width: 64px

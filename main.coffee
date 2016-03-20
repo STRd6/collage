@@ -31,10 +31,9 @@ app = self =
   activeTool: Observable(tools.move)
   screenElement: screenElement
 
-  tools: [
-    tools.move
-    tools.cut
-  ]
+  tools: Observable ->
+    Object.keys(tools).map (name) ->
+      tools[name]
 
   images: ->
     imageUrls.map (url) ->
