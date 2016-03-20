@@ -38,7 +38,7 @@ module.exports = (document) ->
   cut: do ->
     path = []
     active = false
-    targetSet = null
+    targetMap = null
 
     document.addEventListener 'mouseup', () ->
       return unless active
@@ -52,15 +52,28 @@ module.exports = (document) ->
       # Find the first two intersections of the path and the image boundary
       # Create a path and a complement path
       # split into two
+      
+      canvas = document.querySelector('canvas')
+      context = canvas.getContext('2d')
 
-      targetSet.forEach (target) ->
-        
+      targetMap.forEach (intersections, target) ->
+        if intersections.length >= 2
+          beginPathIndex = intersections.unshift()
+          endPathIndex = intersections.unshift()
+
+          i = beginPathIndex
+          while i < endPathIndex
+            line = Line
+              start: path[i]
+              end: path[i+1]
+            drawLine(context, line, "#0F0")
+            i += 1
 
     name: "Cut"
     mousedown: (e) ->
       active = true
-      targetSet = new Set
-      
+      targetMap = new Map
+
       path = [Point localPosition(e, false)]
 
     mousemove: (e) ->
@@ -72,8 +85,8 @@ module.exports = (document) ->
       if active
         # TODO: Should add all targets underneath this point, not just the top
         if target != e.currentTarget
-          unless targetSet.has target
-            targetSet.add target
+          unless targetMap.has target
+            targetMap.set target, []
 
             drawRect(context, target)
 
@@ -86,12 +99,15 @@ module.exports = (document) ->
         
         drawLine context, line, "purple"
 
-        targetSet.forEach (target) ->
+        targetMap.forEach (intersections, target) ->
           rectLines(target).forEach (targetLine) ->
             intersection = line.intersects(targetLine)
 
             if intersection
               drawCircle context, intersection
+
+              intersections.push path.length
+              path.push intersection
 
         path.push current
 
