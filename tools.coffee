@@ -72,6 +72,8 @@ module.exports = (document) ->
 
           # Trace around image
           edgePath = pathPoints(target)
+          
+          debugger
 
           if endImageEdge is beginImageEdge
             line = Line
@@ -79,14 +81,13 @@ module.exports = (document) ->
               end: path[beginPathIndex]
             drawLine(context, line, "#0F0")
           else
-            i = beginImageEdge
+            i = beginImageEdge + 1 % edgePath.length
 
             line = Line
               start: path[endPathIndex]
               end: edgePath[i]
             drawLine(context, line, "#0F0")
 
-            i += 1
             while i != endImageEdge
               nextPathIndex = (i + 1) % edgePath.length
               line = Line
@@ -95,6 +96,11 @@ module.exports = (document) ->
               drawLine(context, line, "#0F0")
 
               i = nextPathIndex
+            
+            line = Line
+              start: edgePath[i]
+              end: path[beginPathIndex]
+            drawLine(context, line, "#0F0")
 
           return
 
