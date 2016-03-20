@@ -57,6 +57,7 @@ module.exports = (document) ->
       context = canvas.getContext('2d')
 
       targetMap.forEach (intersections, target) ->
+        # TODO: Repeat for next two intersections
         if intersections.length >= 2
           [beginPathIndex, endImageEdge] = intersections.shift()
           [endPathIndex, beginImageEdge] = intersections.shift()
@@ -109,10 +110,7 @@ module.exports = (document) ->
             maskPath.push path[beginPathIndex]
             drawLine(context, line, "#0F0")
 
-          # Use the closed path to create a mask and a negative
-          # Duplicate the object and apply the mask/negative
-          # Now we have two!
-          # Repeat for next two intersections
+          clipMask(target, maskPath)
 
         return
 
@@ -159,6 +157,41 @@ module.exports = (document) ->
         path.push current
 
     mouseup: (e) ->
+
+clipMask = (target, maskPath) ->
+  # Apply the mask
+  c = document.createElement "canvas"
+  c.width = target.naturalWidth
+  c.height = target.naturalHeight
+  ct = c.getContext('2d')
+  applyClip(ct, maskPath)
+  ct.drawImage(target, 0, 0)
+  target.parentElement.appendChild(c)
+
+  # Apply the negative
+  c = document.createElement "canvas"
+  c.width = target.naturalWidth
+  c.height = target.naturalHeight
+  ct = c.getContext('2d')
+  ct.drawImage(target, 0, 0)
+  applyClip(ct, maskPath)
+  ct.globalCompositeOperation = "destination-out"
+  ct.fillStyle = "#000"
+  ct.fillRect(0, 0, c.width, c.height)
+  target.parentElement.appendChild(c)
+
+  target.remove()
+
+applyClip = (ct, maskPath) ->
+  maskPath.forEach ({x, y}, i) ->
+    if i is 0
+      ct.beginPath()
+      ct.moveTo(x, y)
+    else
+      ct.lineTo(x, y)
+
+  ct.closePath()
+  ct.clip()
 
 drawCircle = (context, p) ->
   context.beginPath()
