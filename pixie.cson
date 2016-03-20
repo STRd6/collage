@@ -2,3 +2,4 @@ dependencies:
   bindable: "distri/bindable:v0.2.0"
   matrix: "distri/matrix:master"
   observable: "distri/observable:master"
+  point: "distri/point:master"

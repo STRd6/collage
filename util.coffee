@@ -1,4 +1,5 @@
 Matrix = require "matrix"
+Matrix.Point = require "point"
 
 Matrix::toCSS3Transform ?= ->
   """

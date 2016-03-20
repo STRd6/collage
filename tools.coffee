@@ -1,6 +1,8 @@
 {localPosition} = require "./util"
 
+Line = require "./lib/line"
 Matrix = require "matrix"
+Point = require "point"
 
 module.exports = (document) ->
   move: do ->
@@ -36,34 +38,100 @@ module.exports = (document) ->
   cut: do ->
     path = []
     active = false
+    targetSet = null
 
     document.addEventListener 'mouseup', () ->
+      return unless active
       active = false
-      
-      console.log path
-      
-      canvas = document.querySelector('canvas')
-      
-      context = canvas.getContext('2d')
 
-      path.forEach ({x, y}, i) ->
-        if i is 0
-          context.beginPath()
-          context.moveTo(x, y)
-        else
-          context.lineTo(x, y)
-      
-      context.lineWidth = 5
-      context.strokeStyle = 'blue'
-      context.stroke()
+      # For each target in our set we want to cut it into smaller pieces
+      # if the cut crosses the boundary of the image in two places then we can cut it
+      # if the cut crosses the boundary in 1 place it is not complete and we can't cut it
+      # if the cut crosses the boundary in more than two places we may be able to cut it into more than two pieces
+
+      # Find the first two intersections of the path and the image boundary
+      # Create a path and a complement path
+      # split into two
+
+      targetSet.forEach (target) ->
+        
 
     name: "Cut"
     mousedown: (e) ->
       active = true
-      path = [localPosition(e, false)]
+      targetSet = new Set
+      
+      path = [Point localPosition(e, false)]
 
     mousemove: (e) ->
-      path.push localPosition(e, false)
+      target = e.target
+
+      canvas = document.querySelector('canvas')
+      context = canvas.getContext('2d')
+
+      if active
+        # TODO: Should add all targets underneath this point, not just the top
+        if target != e.currentTarget
+          unless targetSet.has target
+            targetSet.add target
+
+            drawRect(context, target)
+
+        prev = path[path.length - 1]
+        current = Point localPosition(e, false)
+
+        line = Line
+          start: prev
+          end: current
+        
+        drawLine context, line, "purple"
+
+        targetSet.forEach (target) ->
+          rectLines(target).forEach (targetLine) ->
+            intersection = line.intersects(targetLine)
+
+            if intersection
+              drawCircle context, intersection
+
+        path.push current
 
     mouseup: (e) ->
-      
+
+drawCircle = (context, p) ->
+  context.beginPath()
+  context.arc(p.x, p.y, 5, 0, 2*Math.PI)
+  context.fillStyle = "magenta"
+  context.fill()
+
+rectLines = (target) ->
+  width = target.naturalWidth
+  height = target.naturalHeight
+
+  matrix = target.matrix
+
+  points = [
+    Point(0, 0)
+    Point(width, 0)
+    Point(width, height)
+    Point(0, height)
+  ].map(matrix.transformPoint.bind(matrix))
+
+  points.map (currentPoint, i) ->
+    nextPoint = points[i + 1] or points[0]
+
+    Line
+      start: currentPoint
+      end: nextPoint
+
+drawLine = (context, line, color="orange") ->
+  context.beginPath()
+  context.moveTo(line.start.x, line.start.y)
+  context.lineTo(line.end.x, line.end.y)
+  context.lineWidth = 5
+  context.strokeStyle = color
+  context.stroke()
+
+drawRect = (context, target) ->
+  rectLines(target)
+  .forEach (line) ->
+    drawLine context, line

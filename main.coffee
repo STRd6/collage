@@ -2,6 +2,8 @@ style = document.createElement "style"
 style.innerHTML = require "./style"
 document.head.appendChild style
 
+global.PACKAGE = PACKAGE
+
 require "./lib/canvas-to-blob"
 
 {localPosition} = require "./util"
