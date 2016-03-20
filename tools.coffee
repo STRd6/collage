@@ -37,6 +37,7 @@ module.exports = ->
   rotate: do ->
     activeElement = null
     originalMatrix = null
+    originalPosition = null
     midpoint = null
 
     name: "Rotate"
@@ -49,18 +50,20 @@ module.exports = ->
 
       midpoint = getMidpoint(activeElement)
       originalMatrix = activeElement.matrix
-      offset = localPosition(e, false, false)
+      originalPosition = Point localPosition(e, false)
 
     mousemove: (e, editor) ->
       if activeElement
-        console.log localPosition(e, false)
+        position = Point localPosition(e, false)
 
         canvas = editor.screenElement
         context = canvas.getContext('2d')
 
-        drawCircle context, midpoint
-        drawRect context, activeElement
-        # activeElement.matrix = Matrix.rotation(Math.PI / 50, midpoint)
+        # drawCircle context, midpoint
+        # drawRect context, activeElement
+
+        rotation = angleBetween(originalPosition, position, midpoint)
+        updateElement activeElement, Matrix.rotation(rotation, midpoint).concat(originalMatrix).quantize()
 
     mouseup: (e) ->
       activeElement = null
@@ -99,7 +102,7 @@ module.exports = ->
         line = Line
           start: prev
           end: current
-        
+
         drawLine context, line, "purple"
 
         targetMap.forEach (intersections, target) ->
@@ -168,8 +171,8 @@ module.exports = ->
 
 
 clipMask = (target, maskPath) ->
-  width = target.naturalWidth or target.width
-  height = target.naturalHeight or target.height
+  width = target.naturalWidth
+  height = target.naturalHeight
   matrix = target.matrix
   inverseMatrix = matrix.inverse()
 
@@ -232,8 +235,8 @@ drawCircle = (context, p) ->
   context.fill()
 
 pathPoints = (target) ->
-  width = target.naturalWidth or target.width
-  height = target.naturalHeight or target.height
+  width = target.naturalWidth
+  height = target.naturalHeight
 
   matrix = target.matrix
 
@@ -266,3 +269,12 @@ drawRect = (context, target) ->
   rectLines(target)
   .forEach (line) ->
     drawLine context, line
+
+updateElement = (element, matrix) ->
+  element.matrix = matrix
+  element.style = matrix.toCSS3Transform()
+
+  return element
+
+angleBetween = (a, b, origin=Point.ZERO) ->
+  Point.direction(origin, b) - Point.direction(origin, a)

@@ -6,6 +6,15 @@ Matrix::toCSS3Transform ?= ->
     transform: #{@toString().toLowerCase()}
   """
 
+round = (num) ->
+  Math.round(num * 10000) / 10000
+
+# Not too happy with the tx,ty being snapped to whole numbers, it can
+# cause repeated operations to drift towards zero, but it does keep the
+# rendering looking sharper rather than blurry
+Matrix::quantize ?= ->
+  Matrix.apply(null, [@a, @b, @c, @d].map(round).concat(0|@tx, 0|@ty))
+
 Object.defineProperty HTMLCanvasElement.prototype, "naturalWidth",
   get: ->
     @width
