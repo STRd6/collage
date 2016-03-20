@@ -1,3 +1,10 @@
+Matrix = require "matrix"
+
+Matrix::toCSS3Transform ?= ->
+  """
+    transform: #{@toString().toLowerCase()}
+  """
+
 module.exports =
   localPosition: (e, scaled=true, current=true) ->
     if current

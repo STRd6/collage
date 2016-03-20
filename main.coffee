@@ -10,10 +10,11 @@ Renderer = require "./renderer"
 renderer = Renderer()
 
 Matrix = require "matrix"
+Observable = require "observable"
 
 Template = require "./templates/app"
 
-activeTool = require("./tools")(document).move
+tools = require("./tools")(document)
 
 imageUrls = [
   "https://0.pixiecdn.com/sprites/138612/original.png"
@@ -22,8 +23,14 @@ imageUrls = [
   "https://2.pixiecdn.com/sprites/137922/original.png"
 ]
 
-app =
+app = self =
+  activeTool: Observable(tools.move)
   screenElement: document.createElement('canvas')
+
+  tools: [
+    tools.move
+    tools.cut
+  ]
 
   images: ->
     imageUrls.map (url) ->
@@ -74,17 +81,17 @@ app =
   mousedown: (e) ->
     e.preventDefault()
 
-    activeTool.mousedown(e)
+    self.activeTool().mousedown(e)
 
   mousemove: (e) ->
     e.preventDefault()
 
-    activeTool.mousemove(e)
+    self.activeTool().mousemove(e)
 
   mouseup: (e) ->
     e.preventDefault()
 
-    activeTool.mouseup(e)
+    self.activeTool().mouseup(e)
 
   workspaceDragover: (e) ->
     e.preventDefault()
@@ -116,8 +123,13 @@ document.body.appendChild Template app
 
 scene = document.querySelector("scene")
 
+setOverlaySize = ->
+  canvas = document.querySelector('canvas')
+  
+  {width, height} = scene.getBoundingClientRect()
 
-Matrix::toCSS3Transform ?= ->
-  """
-    transform: #{@toString().toLowerCase()}
-  """
+  canvas.width = width
+  canvas.height = height
+
+window.addEventListener "resize", setOverlaySize
+setOverlaySize()

@@ -10,6 +10,7 @@ module.exports = (document) ->
     document.addEventListener 'mouseup', () ->
       activeElement = null
 
+    name: "Move"
     mousedown: (e) ->
       # Raise to top
       return if e.target is e.currentTarget
@@ -38,7 +39,25 @@ module.exports = (document) ->
 
     document.addEventListener 'mouseup', () ->
       active = false
+      
+      console.log path
+      
+      canvas = document.querySelector('canvas')
+      
+      context = canvas.getContext('2d')
 
+      path.forEach ({x, y}, i) ->
+        if i is 0
+          context.beginPath()
+          context.moveTo(x, y)
+        else
+          context.lineTo(x, y)
+      
+      context.lineWidth = 5
+      context.strokeStyle = 'blue'
+      context.stroke()
+
+    name: "Cut"
     mousedown: (e) ->
       active = true
       path = [localPosition(e, false)]
@@ -47,4 +66,4 @@ module.exports = (document) ->
       path.push localPosition(e, false)
 
     mouseup: (e) ->
-      console.log path
+      
