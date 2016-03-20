@@ -69,10 +69,26 @@ module.exports = (document) ->
               end: path[i+1]
             drawLine(context, line, "#0F0")
             i += 1
-          
+
           # Trace around image
           edgePath = pathPoints(target)
-          i = beginImageEdge
+
+          if endImageEdge is beginImageEdge
+            line = Line
+              start: path[endPathIndex]
+              end: path[beginPathIndex]
+            drawLine(context, line, "#0F0")
+          else
+            i = beginImageEdge
+
+            while i != endImageEdge
+              line = Line
+                start: path[endPathIndex]
+                end: edgePath[i]
+              drawLine(context, line, "#0F0")
+              i += 1
+              if i is edgePath.length
+                i = 0
 
           return
 
@@ -126,7 +142,7 @@ drawCircle = (context, p) ->
   context.fillStyle = "magenta"
   context.fill()
 
-pathPoints (target) ->
+pathPoints = (target) ->
   width = target.naturalWidth
   height = target.naturalHeight
 
