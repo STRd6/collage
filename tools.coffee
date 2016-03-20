@@ -58,9 +58,10 @@ module.exports = (document) ->
 
       targetMap.forEach (intersections, target) ->
         if intersections.length >= 2
-          beginPathIndex = intersections.unshift()
-          endPathIndex = intersections.unshift()
+          [beginPathIndex, endImageEdge] = intersections.shift()
+          [endPathIndex, beginImageEdge] = intersections.shift()
 
+          # Trace the path across
           i = beginPathIndex
           while i < endPathIndex
             line = Line
@@ -68,6 +69,12 @@ module.exports = (document) ->
               end: path[i+1]
             drawLine(context, line, "#0F0")
             i += 1
+          
+          # Trace around image
+          edgePath = pathPoints(target)
+          i = beginImageEdge
+
+          return
 
     name: "Cut"
     mousedown: (e) ->
@@ -100,13 +107,13 @@ module.exports = (document) ->
         drawLine context, line, "purple"
 
         targetMap.forEach (intersections, target) ->
-          rectLines(target).forEach (targetLine) ->
+          rectLines(target).forEach (targetLine, i) ->
             intersection = line.intersects(targetLine)
 
             if intersection
               drawCircle context, intersection
 
-              intersections.push path.length
+              intersections.push [path.length, i]
               path.push intersection
 
         path.push current
@@ -119,7 +126,7 @@ drawCircle = (context, p) ->
   context.fillStyle = "magenta"
   context.fill()
 
-rectLines = (target) ->
+pathPoints (target) ->
   width = target.naturalWidth
   height = target.naturalHeight
 
@@ -131,6 +138,9 @@ rectLines = (target) ->
     Point(width, height)
     Point(0, height)
   ].map(matrix.transformPoint.bind(matrix))
+
+rectLines = (target) ->
+  points = pathPoints(target)
 
   points.map (currentPoint, i) ->
     nextPoint = points[i + 1] or points[0]
