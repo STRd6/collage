@@ -61,24 +61,27 @@ module.exports = (document) ->
           [beginPathIndex, endImageEdge] = intersections.shift()
           [endPathIndex, beginImageEdge] = intersections.shift()
 
+          maskPath = []
+
           # Trace the path across
           i = beginPathIndex
           while i < endPathIndex
+            start = path[i]
             line = Line
-              start: path[i]
+              start: start
               end: path[i+1]
+            maskPath.push start
             drawLine(context, line, "#0F0")
             i += 1
 
           # Trace around image
           edgePath = pathPoints(target)
-          
-          debugger
 
           if endImageEdge is beginImageEdge
             line = Line
               start: path[endPathIndex]
               end: path[beginPathIndex]
+            maskPath.push path[endPathIndex], path[beginPathIndex]
             drawLine(context, line, "#0F0")
           else
             i = beginImageEdge + 1 % edgePath.length
@@ -86,23 +89,32 @@ module.exports = (document) ->
             line = Line
               start: path[endPathIndex]
               end: edgePath[i]
+            maskPath.push path[endPathIndex]
             drawLine(context, line, "#0F0")
 
             while i != endImageEdge
               nextPathIndex = (i + 1) % edgePath.length
+              start = edgePath[i]
               line = Line
-                start: edgePath[i]
+                start: start
                 end: edgePath[nextPathIndex]
+              maskPath.push start
               drawLine(context, line, "#0F0")
 
               i = nextPathIndex
-            
+
             line = Line
               start: edgePath[i]
               end: path[beginPathIndex]
+            maskPath.push path[beginPathIndex]
             drawLine(context, line, "#0F0")
 
-          return
+          # Use the closed path to create a mask and a negative
+          # Duplicate the object and apply the mask/negative
+          # Now we have two!
+          # Repeat for next two intersections
+
+        return
 
     name: "Cut"
     mousedown: (e) ->
