@@ -1,10 +1,11 @@
+- Tool = require "../presenters/tool"
+- editor = this
+
 app
   tools
     button(click=@render) Render
-    - activeTool = @activeTool
     - @tools.forEach (tool) ->
-      - activate = -> activeTool tool
-      tool(click=activate)= tool.name
+      = Tool tool, editor
   workspace
     scene(drop=@workspaceDrop dragover=@workspaceDragover @mousedown @mousemove @mouseup)
     = @screenElement
