@@ -8,5 +8,8 @@ app
   workspace
     scene(drop=@workspaceDrop dragover=@workspaceDragover @mousedown @mousemove @mouseup)
     = @screenElement
-  materials(dragstart=@materialDrag)
-    = @images
+  tray
+    materials(dragstart=@materialDrag)
+      = @images
+    actions
+      button(click=@render) Render

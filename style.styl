@@ -11,11 +11,8 @@ app
   display: flex
   height: 100%
 
-  & > tools, & > materials, & > workspace
-    display: block
-    flex-grow: 0
-
   & > workspace
+    display: block
     flex-grow: 1
     height: 100%
     position: relative
@@ -39,6 +36,7 @@ app
 
   & > tools
     background-color: #666
+    flex-grow: 0
     & > tool
       background-color: #CCC
       background-position: center
@@ -59,11 +57,23 @@ app
       &:last-child
         border-bottom-right-radius: 2px
 
-  & > materials
-    background-color: #666
+  & > tray
     border-left: 1px solid #AAA
+    flex-grow: 0
     width: 129px
+    height: 100%
 
-    & > img
-      max-width: 64px
-      height: auto
+    & > actions
+      display: block
+      position: absolute
+      bottom: 0
+
+    & > materials
+      background-color: #666
+      display: block
+      width: 100%
+      height: 100%
+  
+      & > img
+        max-width: 64px
+        height: auto
