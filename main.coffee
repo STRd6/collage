@@ -13,14 +13,7 @@ Matrix = require "matrix"
 
 Template = require "./templates/app"
 
-# TouchScreen = require "./lib/touchscreen"
-# touchScreen = TouchScreen document.createElement "screen"
-# touchScreen.on "touch", (e) -> console.log e
-
 activeTool = require("./tools")(document).move
-console.log activeTool
-workspace = null
-context = null
 
 imageUrls = [
   "https://0.pixiecdn.com/sprites/138612/original.png"
@@ -43,8 +36,12 @@ app =
 
   render: ->
     {width, height} = scene.getBoundingClientRect()
+
+    canvas = document.createElement("canvas")
     canvas.width = width
     canvas.height = height
+
+    context = canvas.getContext("2d")
 
     context.clearRect(0, 0, canvas.width, canvas.height)
     renderer.render(context, scene)
@@ -117,12 +114,7 @@ app =
 
 document.body.appendChild Template app
 
-workspace = document.querySelector("workspace")
 scene = document.querySelector("scene")
-canvas = document.createElement("canvas")
-
-context = canvas.getContext("2d")
-
 
 
 Matrix::toCSS3Transform ?= ->
