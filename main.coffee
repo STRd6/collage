@@ -4,6 +4,8 @@ document.head.appendChild style
 
 require "./lib/canvas-to-blob"
 
+{localPosition} = require "./util"
+
 Renderer = require "./renderer"
 renderer = Renderer()
 
@@ -15,8 +17,8 @@ Template = require "./templates/app"
 # touchScreen = TouchScreen document.createElement "screen"
 # touchScreen.on "touch", (e) -> console.log e
 
-activeElement = null
-offset = null
+activeTool = require("./tools")(document).move
+console.log activeTool
 workspace = null
 context = null
 
@@ -27,11 +29,8 @@ imageUrls = [
   "https://2.pixiecdn.com/sprites/137922/original.png"
 ]
 
-document.addEventListener "mouseup", ->
-  activeElement = null
-
-document.body.appendChild Template
-  screenElement: [] #touchScreen.element()
+app =
+  screenElement: document.createElement('canvas')
 
   images: ->
     imageUrls.map (url) ->
@@ -43,12 +42,12 @@ document.body.appendChild Template
       return img
 
   render: ->
-    {width, height} = workspace.getBoundingClientRect()
+    {width, height} = scene.getBoundingClientRect()
     canvas.width = width
     canvas.height = height
 
     context.clearRect(0, 0, canvas.width, canvas.height)
-    renderer.render(context, workspace)
+    renderer.render(context, scene)
     console.log canvas.toBlob (blob) ->
       url = URL.createObjectURL(blob)
       console.log url
@@ -76,25 +75,19 @@ document.body.appendChild Template
       src: img.src
 
   mousedown: (e) ->
-    return if e.target is e.currentTarget
-
     e.preventDefault()
-    e.currentTarget.appendChild e.target
 
-    offset = localPosition(e, false, false)
-
-    activeElement = e.target
-    console.log activeElement
+    activeTool.mousedown(e)
 
   mousemove: (e) ->
-    return unless activeElement
+    e.preventDefault()
 
-    {x, y} = localPosition(e, false)
-    x -= offset.x
-    y -= offset.y
+    activeTool.mousemove(e)
 
-    activeElement.matrix = Matrix.translate(x, y)
-    activeElement.style = activeElement.matrix.toCSS3Transform()
+  mouseup: (e) ->
+    e.preventDefault()
+
+    activeTool.mouseup(e)
 
   workspaceDragover: (e) ->
     e.preventDefault()
@@ -122,28 +115,15 @@ document.body.appendChild Template
     e.currentTarget.appendChild img
     # e.currentTarget.insertBefore img, touchScreen.element()
 
+document.body.appendChild Template app
+
 workspace = document.querySelector("workspace")
+scene = document.querySelector("scene")
 canvas = document.createElement("canvas")
 
 context = canvas.getContext("2d")
 
-localPosition = (e, scaled=true, current=true) ->
-  if current
-    target = e.currentTarget
-  else
-    target = e.target
 
-  rect = target.getBoundingClientRect()
-
-  x = e.pageX - rect.left
-  y = e.pageY - rect.top
-
-  if scaled
-    x: x / rect.width
-    y: y / rect.height
-  else
-    x: x
-    y: y
 
 Matrix::toCSS3Transform ?= ->
   """

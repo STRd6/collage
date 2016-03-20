@@ -1,7 +1,9 @@
 app
   tools
     button(click=@render) Render
-  workspace(drop=@workspaceDrop dragover=@workspaceDragover mousedown=@mousedown mousemove=@mousemove)
+    
+  workspace
+    scene(drop=@workspaceDrop dragover=@workspaceDragover @mousedown @mousemove @mouseup)
     = @screenElement
   materials(dragstart=@materialDrag)
     = @images
