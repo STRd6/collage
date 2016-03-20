@@ -16,7 +16,7 @@ Observable = require "observable"
 
 Template = require "./templates/app"
 
-tools = require("./tools")(document)
+tools = require("./tools")
 
 imageUrls = [
   "https://0.pixiecdn.com/sprites/138612/original.png"
@@ -26,6 +26,11 @@ imageUrls = [
 ]
 
 screenElement = document.createElement('canvas')
+
+document.addEventListener 'mouseup', (e) ->
+  e.preventDefault()
+
+  app.activeTool().mouseup(e, self)
 
 app = self =
   activeTool: Observable(tools.move)
@@ -90,11 +95,6 @@ app = self =
     e.preventDefault()
 
     self.activeTool().mousemove(e, self)
-
-  mouseup: (e) ->
-    e.preventDefault()
-
-    self.activeTool().mouseup(e, self)
 
   workspaceDragover: (e) ->
     e.preventDefault()
