@@ -7,29 +7,31 @@ Point = require "point"
 module.exports = ->
   move: do ->
     activeElement = null
-    offset = null
+    originalMatrix = null
+    originalPosition = null
 
     name: "Move"
     iconURL: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiPjx0aXRsZT4xNjwvdGl0bGU+PGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+PGcgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc2tldGNoOnR5cGU9Ik1TUGFnZSI+PHBhdGggZD0iTTk1LDUwLjAxODk4NDggTDgxLjQ1MDA2OTYsNjMuNTY4ODAwOCBMNzcuMTU0MTU3Nyw1OS4yNzM2ODQ2IEw4My4zODk1NzA5LDUzLjAzODMyMzkgTDUzLjAzNzIxMDUsNTMuMDM4MzIzOSBMNTMuMDM3MjEwNSw4My4zNzA2ODQxIEw1OS4yNTQzOTgyLDc3LjE1NDMwODMgTDYzLjU1MDMxMDEsODEuNDUwMTgzOSBMNDkuOTk5NjIwMyw5NSBMMzYuNDQ5Njg5OSw4MS40NTAxODM5IEw0MC43NDU2MDE4LDc3LjE1NDMwODMgTDQ2Ljk2MjAzMDEsODMuMzcwNjg0MSBMNDYuOTYyMDMwMSw1My4wMzgzMjM5IEwxNi42MTA0MjkxLDUzLjAzODMyMzkgTDIyLjg0NTg0MjMsNTkuMjczNjg0NiBMMTguNTQ5OTMwNCw2My41Njg4MDA4IEw1LDUwLjAxODk4NDggTDE4LjU0OTkzMDQsMzYuNDY4NDA5MyBMMjIuODQ1ODQyMyw0MC43NjM1MjU2IEwxNi42NDY4ODAxLDQ2Ljk2MzE5NDggTDQ2Ljk2MjAzMDEsNDYuOTYzMTk0OCBMNDYuOTYyMDMwMSwxNi42MjkzMTU5IEw0MC43NDU2MDE4LDIyLjg0NjQ1MTEgTDM2LjQ0OTY4OTksMTguNTUxMzM0OCBMNDkuOTk5NjIwMyw1IEw2My41NTAzMTAxLDE4LjU1MTMzNDggTDU5LjI1NDM5ODIsMjIuODQ2NDUxMSBMNTMuMDM3MjEwNSwxNi42MjkzMTU5IEw1My4wMzcyMTA1LDQ2Ljk2MzE5NDggTDgzLjM1MjM2MDUsNDYuOTYzMTk0OCBMNzcuMTU0MTU3Nyw0MC43NjM1MjU2IEw4MS40NTAwNjk2LDM2LjQ2ODQwOTMgTDk1LDUwLjAxODk4NDggWiIgZmlsbD0iIzAwMDAwMCIgc2tldGNoOnR5cGU9Ik1TU2hhcGVHcm91cCI+PC9wYXRoPjwvZz48L3N2Zz4="
     mousedown: (e) ->
-      return if e.target is e.currentTarget
-      # Raise to top
-      e.currentTarget.appendChild e.target
+      target = e.target
+      return if target is e.currentTarget
 
-      # Track offset
-      offset = localPosition(e, false, false)
+      activeElement = target
 
-      # Track active element
-      activeElement = e.target
+      originalMatrix = activeElement.matrix
+      originalPosition = Point localPosition(e, false)
+
     mousemove: (e) ->
       return unless activeElement
 
-      {x, y} = localPosition(e, false)
-      x -= offset.x
-      y -= offset.y
+      position = Point localPosition(e, false)
 
-      activeElement.matrix = Matrix.translate(x, y)
-      activeElement.style = activeElement.matrix.toCSS3Transform()
+      {x, y} = position.subtract(originalPosition)
+
+      transformation = Matrix.translate(x, y)
+
+      finalMatrix = transformation.concat(originalMatrix).quantize()
+      updateElement activeElement, finalMatrix
 
     mouseup: (e) ->
       activeElement = null
@@ -53,17 +55,15 @@ module.exports = ->
       originalPosition = Point localPosition(e, false)
 
     mousemove: (e, editor) ->
-      if activeElement
-        position = Point localPosition(e, false)
+      return unless activeElement
 
-        canvas = editor.screenElement
-        context = canvas.getContext('2d')
+      position = Point localPosition(e, false)
 
-        # drawCircle context, midpoint
-        # drawRect context, activeElement
+      rotation = angleBetween(originalPosition, position, midpoint)
+      transformation = Matrix.rotation(rotation, midpoint)
 
-        rotation = angleBetween(originalPosition, position, midpoint)
-        updateElement activeElement, Matrix.rotation(rotation, midpoint).concat(originalMatrix).quantize()
+      finalMatrix = transformation.concat(originalMatrix).quantize()
+      updateElement activeElement, finalMatrix
 
     mouseup: (e) ->
       activeElement = null
