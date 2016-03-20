@@ -24,17 +24,24 @@ Object.defineProperty HTMLCanvasElement.prototype, "naturalHeight",
     @height
 
 module.exports =
+  extend: (target, sources...) ->
+    for source in sources
+      for name of source
+        target[name] = source[name]
+
+    return target
+
   localPosition: (e, scaled=true, current=true) ->
     if current
       target = e.currentTarget
     else
       target = e.target
-  
+
     rect = target.getBoundingClientRect()
-  
+
     x = e.pageX - rect.left
     y = e.pageY - rect.top
-  
+
     if scaled
       x: x / rect.width
       y: y / rect.height

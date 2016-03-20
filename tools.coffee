@@ -1,73 +1,72 @@
-{localPosition} = require "./util"
+{extend, localPosition} = require "./util"
 
 Line = require "./lib/line"
 Matrix = require "matrix"
 Point = require "point"
 
-module.exports = ->
-  move: do ->
-    activeElement = null
-    originalMatrix = null
-    originalPosition = null
+transformTool = (toolData, handler) ->
+  state =
+    activeElement: null
+    originalMatrix: null
+    originalPosition: null
+    midpoint: null
 
-    name: "Move"
-    iconURL: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiPjx0aXRsZT4xNjwvdGl0bGU+PGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+PGcgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc2tldGNoOnR5cGU9Ik1TUGFnZSI+PHBhdGggZD0iTTk1LDUwLjAxODk4NDggTDgxLjQ1MDA2OTYsNjMuNTY4ODAwOCBMNzcuMTU0MTU3Nyw1OS4yNzM2ODQ2IEw4My4zODk1NzA5LDUzLjAzODMyMzkgTDUzLjAzNzIxMDUsNTMuMDM4MzIzOSBMNTMuMDM3MjEwNSw4My4zNzA2ODQxIEw1OS4yNTQzOTgyLDc3LjE1NDMwODMgTDYzLjU1MDMxMDEsODEuNDUwMTgzOSBMNDkuOTk5NjIwMyw5NSBMMzYuNDQ5Njg5OSw4MS40NTAxODM5IEw0MC43NDU2MDE4LDc3LjE1NDMwODMgTDQ2Ljk2MjAzMDEsODMuMzcwNjg0MSBMNDYuOTYyMDMwMSw1My4wMzgzMjM5IEwxNi42MTA0MjkxLDUzLjAzODMyMzkgTDIyLjg0NTg0MjMsNTkuMjczNjg0NiBMMTguNTQ5OTMwNCw2My41Njg4MDA4IEw1LDUwLjAxODk4NDggTDE4LjU0OTkzMDQsMzYuNDY4NDA5MyBMMjIuODQ1ODQyMyw0MC43NjM1MjU2IEwxNi42NDY4ODAxLDQ2Ljk2MzE5NDggTDQ2Ljk2MjAzMDEsNDYuOTYzMTk0OCBMNDYuOTYyMDMwMSwxNi42MjkzMTU5IEw0MC43NDU2MDE4LDIyLjg0NjQ1MTEgTDM2LjQ0OTY4OTksMTguNTUxMzM0OCBMNDkuOTk5NjIwMyw1IEw2My41NTAzMTAxLDE4LjU1MTMzNDggTDU5LjI1NDM5ODIsMjIuODQ2NDUxMSBMNTMuMDM3MjEwNSwxNi42MjkzMTU5IEw1My4wMzcyMTA1LDQ2Ljk2MzE5NDggTDgzLjM1MjM2MDUsNDYuOTYzMTk0OCBMNzcuMTU0MTU3Nyw0MC43NjM1MjU2IEw4MS40NTAwNjk2LDM2LjQ2ODQwOTMgTDk1LDUwLjAxODk4NDggWiIgZmlsbD0iIzAwMDAwMCIgc2tldGNoOnR5cGU9Ik1TU2hhcGVHcm91cCI+PC9wYXRoPjwvZz48L3N2Zz4="
+  extend toolData,
     mousedown: (e) ->
       target = e.target
       return if target is e.currentTarget
 
-      activeElement = target
-
-      originalMatrix = activeElement.matrix
-      originalPosition = Point localPosition(e, false)
+      extend state,
+        activeElement: target
+        midpoint: getMidpoint(target)
+        originalMatrix: target.matrix
+        originalPosition: Point localPosition(e, false)
+    
+      return
 
     mousemove: (e) ->
-      return unless activeElement
+      return unless state.activeElement
 
-      position = Point localPosition(e, false)
+      extend state, 
+        position: Point localPosition(e, false)
 
+      transformation = handler(state)
+
+      finalMatrix = transformation.concat(state.originalMatrix).quantize()
+      updateElement state.activeElement, finalMatrix
+      
+      return
+
+    mouseup: (e) ->
+      state.activeElement = null
+
+      return
+
+module.exports = ->
+  move: transformTool
+    name: "Move"
+    iconURL: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHZlcnNpb249IjEuMSIgeD0iMHB4IiB5PSIwcHgiPjx0aXRsZT4xNjwvdGl0bGU+PGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+PGcgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc2tldGNoOnR5cGU9Ik1TUGFnZSI+PHBhdGggZD0iTTk1LDUwLjAxODk4NDggTDgxLjQ1MDA2OTYsNjMuNTY4ODAwOCBMNzcuMTU0MTU3Nyw1OS4yNzM2ODQ2IEw4My4zODk1NzA5LDUzLjAzODMyMzkgTDUzLjAzNzIxMDUsNTMuMDM4MzIzOSBMNTMuMDM3MjEwNSw4My4zNzA2ODQxIEw1OS4yNTQzOTgyLDc3LjE1NDMwODMgTDYzLjU1MDMxMDEsODEuNDUwMTgzOSBMNDkuOTk5NjIwMyw5NSBMMzYuNDQ5Njg5OSw4MS40NTAxODM5IEw0MC43NDU2MDE4LDc3LjE1NDMwODMgTDQ2Ljk2MjAzMDEsODMuMzcwNjg0MSBMNDYuOTYyMDMwMSw1My4wMzgzMjM5IEwxNi42MTA0MjkxLDUzLjAzODMyMzkgTDIyLjg0NTg0MjMsNTkuMjczNjg0NiBMMTguNTQ5OTMwNCw2My41Njg4MDA4IEw1LDUwLjAxODk4NDggTDE4LjU0OTkzMDQsMzYuNDY4NDA5MyBMMjIuODQ1ODQyMyw0MC43NjM1MjU2IEwxNi42NDY4ODAxLDQ2Ljk2MzE5NDggTDQ2Ljk2MjAzMDEsNDYuOTYzMTk0OCBMNDYuOTYyMDMwMSwxNi42MjkzMTU5IEw0MC43NDU2MDE4LDIyLjg0NjQ1MTEgTDM2LjQ0OTY4OTksMTguNTUxMzM0OCBMNDkuOTk5NjIwMyw1IEw2My41NTAzMTAxLDE4LjU1MTMzNDggTDU5LjI1NDM5ODIsMjIuODQ2NDUxMSBMNTMuMDM3MjEwNSwxNi42MjkzMTU5IEw1My4wMzcyMTA1LDQ2Ljk2MzE5NDggTDgzLjM1MjM2MDUsNDYuOTYzMTk0OCBMNzcuMTU0MTU3Nyw0MC43NjM1MjU2IEw4MS40NTAwNjk2LDM2LjQ2ODQwOTMgTDk1LDUwLjAxODk4NDggWiIgZmlsbD0iIzAwMDAwMCIgc2tldGNoOnR5cGU9Ik1TU2hhcGVHcm91cCI+PC9wYXRoPjwvZz48L3N2Zz4="
+  , ({position, originalPosition}) ->
       {x, y} = position.subtract(originalPosition)
 
-      transformation = Matrix.translate(x, y)
+      return Matrix.translate(x, y)
 
-      finalMatrix = transformation.concat(originalMatrix).quantize()
-      updateElement activeElement, finalMatrix
-
-    mouseup: (e) ->
-      activeElement = null
-
-  rotate: do ->
-    activeElement = null
-    originalMatrix = null
-    originalPosition = null
-    midpoint = null
-
+  rotate: transformTool
     name: "Rotate"
     iconURL: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjAiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDI0IDI0IiB4bWw6c3BhY2U9InByZXNlcnZlIj48cG9seWdvbiBwb2ludHM9IjMsMyAyLDEwLjMgOC45LDggIj48L3BvbHlnb24+PHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgZD0iTTUuOCw1LjQgIEM3LjQsMy45LDkuNiwzLDEyLDNjNSwwLDksNCw5LDkiPjwvcGF0aD48cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBzdHJva2UtZGFzaGFycmF5PSIzLDIiIGQ9IiAgTTIxLDEyYzAsNS00LDktOSw5Yy0zLjIsMC01LjktMS42LTcuNS00LjEiPjwvcGF0aD48cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBkPSJNNC4yLDcuNiAgQzUuNyw0LjgsOC42LDMsMTIsM2M1LDAsOSw0LDksOSI+PC9wYXRoPjwvc3ZnPg=="
-    mousedown: (e) ->
-      target = e.target
-      return if target is e.currentTarget
-
-      activeElement = target
-
-      midpoint = getMidpoint(activeElement)
-      originalMatrix = activeElement.matrix
-      originalPosition = Point localPosition(e, false)
-
-    mousemove: (e, editor) ->
-      return unless activeElement
-
-      position = Point localPosition(e, false)
-
+  , ({position, originalPosition, midpoint}) ->
       rotation = angleBetween(originalPosition, position, midpoint)
-      transformation = Matrix.rotation(rotation, midpoint)
 
-      finalMatrix = transformation.concat(originalMatrix).quantize()
-      updateElement activeElement, finalMatrix
+      return Matrix.rotation(rotation, midpoint)
 
-    mouseup: (e) ->
-      activeElement = null
+  scale: transformTool
+    name: "Scale"
+    iconURL: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgOTkgOTkiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDk5IDk5OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBhdGggZD0iTTQxLjIsNjAuMmMtMC42LDAtMS4zLTAuMi0xLjctMC43Yy0xLTEtMS0yLjUsMC0zLjVjMS0xLDIuNi0xLDMuNi0wLjFjMSwxLDEsMi41LDAuMSwzLjRsLTAuMSwwLjEgIEM0Mi41LDYwLDQxLjgsNjAuMiw0MS4yLDYwLjJ6IE00Ni43LDU0LjdjLTAuNiwwLTEuMy0wLjItMS44LTAuN2MtMS0xLTEtMi41LDAtMy41bDAuMS0wLjFjMS0xLDIuNS0xLDMuNSwwYzEsMSwxLDIuNSwwLDMuNSAgTDQ4LjQsNTRDNDgsNTQuNSw0Ny4zLDU0LjcsNDYuNyw1NC43eiBNNTIuMiw0OS4yYy0wLjYsMC0xLjMtMC4yLTEuNy0wLjdjLTEtMS0xLTIuNSwwLTMuNWMxLTEsMi42LTEsMy42LTAuMWMxLDEsMSwyLjUsMC4xLDMuNCAgbC0wLjEsMC4xQzUzLjUsNDksNTIuOCw0OS4yLDUyLjIsNDkuMnogTTU3LjcsNDMuN2MtMC42LDAtMS4zLTAuMi0xLjctMC43Yy0xLTEtMS0yLjUsMC0zLjVjMS0xLDIuNi0xLDMuNi0wLjFjMSwxLDEsMi41LDAuMSwzLjQgIEw1OS41LDQzQzU5LDQzLjUsNTguMyw0My43LDU3LjcsNDMuN3oiPjwvcGF0aD48cGF0aCBkPSJNOTEuMiw1SDY2LjVjLTEuNiwwLTIuOCwxLjMtMi44LDIuOHMxLjMsMi44LDIuOCwyLjhoMTguM0w2NSwzMC41Yy0xLjEsMS4xLTEuMSwyLjksMCw0ICBjMC42LDAuNiwxLjMsMC44LDIsMC44YzAuNywwLDEuNS0wLjMsMi0wLjhsMTkuMy0xOS4zdjE3LjNjMCwxLjYsMS4zLDIuOCwyLjgsMi44YzEuNiwwLDIuOC0xLjMsMi44LTIuOFY3LjhDOTQsNi4zLDkyLjcsNSw5MS4yLDV6ICAiPjwvcGF0aD48cGF0aCBkPSJNMzIuNSw4OC4zSDE0LjJMMzQsNjguNWMxLjEtMS4xLDEuMS0yLjksMC00Yy0xLjEtMS4xLTIuOS0xLjEtNCwwTDEwLjcsODMuOFY2Ni41YzAtMS42LTEuMy0yLjgtMi44LTIuOCAgUzUsNjQuOSw1LDY2LjV2MjQuN0M1LDkyLjcsNi4zLDk0LDcuOCw5NGgyNC43YzEuNiwwLDIuOC0xLjMsMi44LTIuOFMzNC4xLDg4LjMsMzIuNSw4OC4zeiI+PC9wYXRoPjwvc3ZnPg=="
+  , ({position, originalPosition, midpoint}) ->
+    {x:x1, y:y1} = originalPosition.subtract(midpoint)
+    {x:x2, y:y2} = position.subtract(midpoint)
 
+    return Matrix.scale(x2 / x1, y2 / y1, midpoint)
   cut: do ->
     path = []
     active = false
@@ -202,7 +201,7 @@ clipMask = (target, maskPath) ->
   ct.globalCompositeOperation = "destination-out"
   ct.fillStyle = "#000"
   ct.fillRect(0, 0, c.width, c.height)
-  
+
   c.matrix = matrix
   c.style = matrix.toCSS3Transform()
   target.parentElement.appendChild(c)
