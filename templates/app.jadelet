@@ -5,4 +5,3 @@ app
     = @screenElement
   materials(dragstart=@materialDrag)
     = @images
-  canvas

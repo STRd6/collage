@@ -2,6 +2,8 @@ style = document.createElement "style"
 style.innerHTML = require "./style"
 document.head.appendChild style
 
+require "./lib/canvas-to-blob"
+
 Renderer = require "./renderer"
 renderer = Renderer()
 
@@ -41,13 +43,21 @@ document.body.appendChild Template
       return img
 
   render: ->
+    {width, height} = workspace.getBoundingClientRect()
+    canvas.width = width
+    canvas.height = height
+
     context.clearRect(0, 0, canvas.width, canvas.height)
     renderer.render(context, workspace)
+    console.log canvas.toBlob (blob) ->
+      url = URL.createObjectURL(blob)
+      console.log url
+      window.open url
 
   materialDrag: (e) ->
-    sourceItem = event.target
+    sourceItem = e.target
 
-    return unless sourceItem instanceof Image
+    return unless sourceItem.parentElement is e.currentTarget
 
     img = new Image
     img.crossOrigin = "Anonymous"
@@ -113,8 +123,7 @@ document.body.appendChild Template
     # e.currentTarget.insertBefore img, touchScreen.element()
 
 workspace = document.querySelector("workspace")
-canvas = document.querySelector("canvas")
-canvas.height = 600
+canvas = document.createElement("canvas")
 
 context = canvas.getContext("2d")
 
