@@ -25,9 +25,11 @@ imageUrls = [
   "https://2.pixiecdn.com/sprites/137922/original.png"
 ]
 
+screenElement = document.createElement('canvas')
+
 app = self =
   activeTool: Observable(tools.move)
-  screenElement: document.createElement('canvas')
+  screenElement: screenElement
 
   tools: [
     tools.move
@@ -83,17 +85,17 @@ app = self =
   mousedown: (e) ->
     e.preventDefault()
 
-    self.activeTool().mousedown(e)
+    self.activeTool().mousedown(e, self)
 
   mousemove: (e) ->
     e.preventDefault()
 
-    self.activeTool().mousemove(e)
+    self.activeTool().mousemove(e, self)
 
   mouseup: (e) ->
     e.preventDefault()
 
-    self.activeTool().mouseup(e)
+    self.activeTool().mouseup(e, self)
 
   workspaceDragover: (e) ->
     e.preventDefault()

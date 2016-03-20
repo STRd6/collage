@@ -39,6 +39,8 @@ module.exports = (document) ->
     path = []
     active = false
     targetMap = null
+    canvas = null
+    context = null
 
     document.addEventListener 'mouseup', () ->
       return unless active
@@ -52,9 +54,8 @@ module.exports = (document) ->
       # Find the first two intersections of the path and the image boundary
       # Create a path and a complement path
       # split into two
-      
-      canvas = document.querySelector('canvas')
-      context = canvas.getContext('2d')
+
+      context.clearRect(0, 0, canvas.width, canvas.height)
 
       targetMap.forEach (intersections, target) ->
         # TODO: Repeat for next two intersections
@@ -68,64 +69,42 @@ module.exports = (document) ->
           i = beginPathIndex
           while i < endPathIndex
             start = path[i]
-            line = Line
-              start: start
-              end: path[i+1]
             maskPath.push start
-            drawLine(context, line, "#0F0")
             i += 1
 
           # Trace around image
           edgePath = pathPoints(target)
 
           if endImageEdge is beginImageEdge
-            line = Line
-              start: path[endPathIndex]
-              end: path[beginPathIndex]
             maskPath.push path[endPathIndex], path[beginPathIndex]
-            drawLine(context, line, "#0F0")
           else
             i = beginImageEdge + 1 % edgePath.length
-
-            line = Line
-              start: path[endPathIndex]
-              end: edgePath[i]
             maskPath.push path[endPathIndex]
-            drawLine(context, line, "#0F0")
 
             while i != endImageEdge
               nextPathIndex = (i + 1) % edgePath.length
               start = edgePath[i]
-              line = Line
-                start: start
-                end: edgePath[nextPathIndex]
               maskPath.push start
-              drawLine(context, line, "#0F0")
 
               i = nextPathIndex
 
-            line = Line
-              start: edgePath[i]
-              end: path[beginPathIndex]
-            maskPath.push path[beginPathIndex]
-            drawLine(context, line, "#0F0")
+            maskPath.push edgePath[i], path[beginPathIndex]
 
           clipMask(target, maskPath)
 
         return
 
     name: "Cut"
-    mousedown: (e) ->
+    mousedown: (e, editor) ->
       active = true
       targetMap = new Map
+      canvas = editor.screenElement
+      context = canvas.getContext('2d')
 
       path = [Point localPosition(e, false)]
 
-    mousemove: (e) ->
+    mousemove: (e, editor) ->
       target = e.target
-
-      canvas = document.querySelector('canvas')
-      context = canvas.getContext('2d')
 
       if active
         # TODO: Should add all targets underneath this point, not just the top
@@ -159,26 +138,43 @@ module.exports = (document) ->
     mouseup: (e) ->
 
 clipMask = (target, maskPath) ->
+  width = target.naturalWidth or target.width
+  height = target.naturalHeight or target.height
+  matrix = target.matrix
+  inverseMatrix = matrix.inverse()
+
+  maskPath = maskPath.map(inverseMatrix.transformPoint.bind(inverseMatrix))
+
   # Apply the mask
   c = document.createElement "canvas"
-  c.width = target.naturalWidth
-  c.height = target.naturalHeight
+  c.width = width
+  c.height = height
   ct = c.getContext('2d')
+
   applyClip(ct, maskPath)
   ct.drawImage(target, 0, 0)
+
+  c.matrix = matrix
+  c.style = matrix.toCSS3Transform()
   target.parentElement.appendChild(c)
 
   # Apply the negative
   c = document.createElement "canvas"
-  c.width = target.naturalWidth
-  c.height = target.naturalHeight
+  c.width = width
+  c.height = height
   ct = c.getContext('2d')
+
   ct.drawImage(target, 0, 0)
   applyClip(ct, maskPath)
   ct.globalCompositeOperation = "destination-out"
   ct.fillStyle = "#000"
   ct.fillRect(0, 0, c.width, c.height)
+  
+  c.matrix = matrix
+  c.style = matrix.toCSS3Transform()
   target.parentElement.appendChild(c)
+
+  # TODO: Autocrop whitespace
 
   target.remove()
 
@@ -200,8 +196,8 @@ drawCircle = (context, p) ->
   context.fill()
 
 pathPoints = (target) ->
-  width = target.naturalWidth
-  height = target.naturalHeight
+  width = target.naturalWidth or target.width
+  height = target.naturalHeight or target.height
 
   matrix = target.matrix
 
