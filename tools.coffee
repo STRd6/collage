@@ -81,14 +81,20 @@ module.exports = (document) ->
           else
             i = beginImageEdge
 
+            line = Line
+              start: path[endPathIndex]
+              end: edgePath[i]
+            drawLine(context, line, "#0F0")
+
+            i += 1
             while i != endImageEdge
+              nextPathIndex = (i + 1) % edgePath.length
               line = Line
-                start: path[endPathIndex]
-                end: edgePath[i]
+                start: edgePath[i]
+                end: edgePath[nextPathIndex]
               drawLine(context, line, "#0F0")
-              i += 1
-              if i is edgePath.length
-                i = 0
+
+              i = nextPathIndex
 
           return
 
