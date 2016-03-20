@@ -6,6 +6,14 @@ Matrix::toCSS3Transform ?= ->
     transform: #{@toString().toLowerCase()}
   """
 
+Object.defineProperty HTMLCanvasElement.prototype, "naturalWidth",
+  get: ->
+    @width
+
+Object.defineProperty HTMLCanvasElement.prototype, "naturalHeight",
+  get: ->
+    @height
+
 module.exports =
   localPosition: (e, scaled=true, current=true) ->
     if current

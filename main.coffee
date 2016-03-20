@@ -16,7 +16,7 @@ Observable = require "observable"
 
 Template = require "./templates/app"
 
-tools = require("./tools")
+tools = require("./tools")()
 
 imageUrls = [
   "https://0.pixiecdn.com/sprites/138612/original.png"
