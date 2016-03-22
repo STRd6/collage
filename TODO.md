@@ -32,10 +32,6 @@ Load Materials from PixieEngine
 Bugs
 ----
 
-Mouseup on knife tool throws error when outside of scene
-
-Knife tool doesn't get the right point when cutting from right edge of image
-
 To Later
 --------
 
@@ -68,3 +64,8 @@ Features
 --------
 
 Auto-crop
+
+Bugs
+----
+
+Knife tool doesn't get the right point when cutting from right edge of image
