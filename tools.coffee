@@ -76,13 +76,6 @@ module.exports = ->
       yScale = xScale = (xScale + yScale) / 2
 
     return Matrix.scale(xScale, yScale, midpoint)
-  autoCrop:
-    name: "Autocrop"
-    mousedown: (e) ->
-      autocrop = require("./autocrop")
-      autocrop(e.target)
-    mousemove: ->
-    mouseup: ->
 
   cut: do ->
     path = []

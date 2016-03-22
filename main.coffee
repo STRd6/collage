@@ -6,7 +6,7 @@ global.PACKAGE = PACKAGE
 
 require "./lib/canvas-to-blob"
 
-{localPosition} = require "./util"
+{localPosition, updateElement} = require "./util"
 
 Renderer = require "./renderer"
 renderer = Renderer()
@@ -72,7 +72,7 @@ app = self =
     img.crossOrigin = "Anonymous"
     img.src = sourceItem.src
 
-    {x, y} = localPosition(e)
+    {x, y} = localPosition(e, true, false)
 
     x = (x * sourceItem.naturalWidth)|0
     y = (y * sourceItem.naturalHeight)|0
@@ -105,7 +105,6 @@ app = self =
     return unless dataText
 
     data = JSON.parse dataText
-    console.log data
 
     {x, y} = localPosition(e, false)
 
@@ -113,12 +112,11 @@ app = self =
     y -= data.offset.y
 
     img = new Image
-    img.matrix = Matrix.translate(x, y)
     img.crossOrigin = "Anonymous"
     img.src = data.src
-    img.style = img.matrix.toCSS3Transform()
+
+    updateElement img, Matrix.translate(x, y)
     e.currentTarget.appendChild img
-    # e.currentTarget.insertBefore img, touchScreen.element()
 
 document.body.appendChild Template app
 

@@ -3,8 +3,6 @@ Matrix = require "matrix"
 module.exports = ->
   render: (context, workspace) ->
     Array::forEach.call workspace.children, (child) ->
-      console.log child
-
       context.withTransform child.matrix, (context) ->
         context.drawImage(child, 0, 0)
 
