@@ -128,7 +128,7 @@ scene = document.querySelector("scene")
 
 setOverlaySize = ->
   canvas = document.querySelector('canvas')
-  
+
   {width, height} = scene.getBoundingClientRect()
 
   canvas.width = width

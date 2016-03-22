@@ -21,20 +21,20 @@ transformTool = (toolData, handler) ->
         midpoint: getMidpoint(target)
         originalMatrix: target.matrix
         originalPosition: Point localPosition(e, false)
-    
+
       return
 
     mousemove: (e) ->
       return unless state.activeElement
 
-      extend state, 
+      extend state,
         position: Point localPosition(e, false)
 
       transformation = handler(state)
 
       finalMatrix = transformation.concat(state.originalMatrix).quantize()
       updateElement state.activeElement, finalMatrix
-      
+
       return
 
     mouseup: (e) ->
