@@ -162,12 +162,13 @@ module.exports = ->
           if endImageEdge is beginImageEdge
             maskPath.push path[endPathIndex], path[beginPathIndex]
           else
-            i = beginImageEdge + 1 % edgePath.length
+            i = (beginImageEdge + 1) % edgePath.length
             maskPath.push path[endPathIndex]
 
             while i != endImageEdge
               nextPathIndex = (i + 1) % edgePath.length
               start = edgePath[i]
+              console.log start, i
               maskPath.push start
 
               i = nextPathIndex

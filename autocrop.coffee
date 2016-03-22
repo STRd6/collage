@@ -10,8 +10,7 @@ module.exports = (canvas) ->
   imageData = context.getImageData(0, 0, canvas.width, canvas.height)
 
   bounds = getContentBounds(imageData)
-  console.log bounds
-  
+
   resize(canvas, bounds)
 
 resize = (canvas, bounds) ->
