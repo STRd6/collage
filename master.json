@@ -14,7 +14,7 @@
     },
     "TODO.md": {
       "path": "TODO.md",
-      "content": "Controls\n--------\n\nKnife Tool\n\nSend to Back/Send to Front/Move Up/Move Down\n\nCamera Tools\n------------\n\nZoom\n\nPan\n\nFeatures\n--------\n\nDisplay Object Boundary on Hover\n\nClick Through Transparent\n\nChange Scene Size\n\nScene Background Color\n\nWarn when closing\n\nDrop Images to add to materials\n\nLoad Materials from PixieEngine\n\nBugs\n----\n\nMouseup on knife tool throws error when outside of scene\n\nKnife tool doesn't get the right point when cutting from right edge of image\n\nTo Later\n--------\n\nGrouping\n\nUndo/Redo\n\nImage Filters\n\nDone\n====\n\nControls\n--------\n\nMove\n\nRotate\n\nScale\n\n\nRendering\n---------\n\nExport Scene\n\n\nFeatures\n--------\n\nAuto-crop\n",
+      "content": "Controls\n--------\n\nKnife Tool\n\nSend to Back/Send to Front/Move Up/Move Down\n\nCamera Tools\n------------\n\nZoom\n\nPan\n\nFeatures\n--------\n\nDisplay Object Boundary on Hover\n\nClick Through Transparent\n\nChange Scene Size\n\nScene Background Color\n\nWarn when closing\n\nDrop Images to add to materials\n\nLoad Materials from PixieEngine\n\nBugs\n----\n\nTo Later\n--------\n\nGrouping\n\nUndo/Redo\n\nImage Filters\n\nDone\n====\n\nControls\n--------\n\nMove\n\nRotate\n\nScale\n\n\nRendering\n---------\n\nExport Scene\n\n\nFeatures\n--------\n\nAuto-crop\n\nBugs\n----\n\nKnife tool doesn't get the right point when cutting from right edge of image\n",
       "mode": "100644",
       "type": "blob"
     },
