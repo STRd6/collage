@@ -67,6 +67,14 @@ module.exports = ->
     {x:x2, y:y2} = position.subtract(midpoint)
 
     return Matrix.scale(x2 / x1, y2 / y1, midpoint)
+  autoCrop:
+    name: "Autocrop"
+    mousedown: (e) ->
+      autocrop = require("./autocrop")
+      autocrop(e.target)
+    mousemove: ->
+    mouseup: ->
+
   cut: do ->
     path = []
     active = false
