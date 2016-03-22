@@ -48,3 +48,9 @@ module.exports =
     else
       x: x
       y: y
+
+  updateElement: (element, matrix) ->
+    element.matrix = matrix
+    element.style = matrix.toCSS3Transform()
+
+    return element

@@ -1,13 +1,37 @@
+Matrix = require "matrix"
+
+{updateElement} = require "./util"
+
 # Take a canvas element with an attached transform
 # modify it and update the transform to be a cropped canvas
 module.exports = (canvas) ->
   context = canvas.getContext('2d')
 
-  transform = canvas.matrix
-
   imageData = context.getImageData(0, 0, canvas.width, canvas.height)
 
-  console.log getContentBounds(imageData)
+  bounds = getContentBounds(imageData)
+  console.log bounds
+  
+  resize(canvas, bounds)
+
+resize = (canvas, bounds) ->
+  transform = canvas.matrix
+
+  {width, height, x, y} = bounds
+
+  spare = document.createElement 'canvas'
+  spare.width = width
+  spare.height = height
+  spare.getContext('2d').drawImage(canvas, -x, -y)
+
+  canvas.width = bounds.width
+  canvas.height = bounds.height
+
+  canvas.getContext('2d').drawImage(spare, 0, 0)
+
+  updateElement canvas, Matrix.translate(x, y).concat(transform)
+
+  return canvas
 
 getContentBounds = (imageData) ->
   {data, width, height} = imageData
@@ -40,5 +64,5 @@ getContentBounds = (imageData) ->
 
   x: xMin|0
   y: yMin|0
-  width: (xMax - xMin)|0
-  height: (yMax - yMin)|0
+  width: (xMax - xMin + 1)|0
+  height: (yMax - yMin + 1)|0

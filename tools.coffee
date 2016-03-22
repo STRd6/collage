@@ -1,8 +1,10 @@
-{extend, localPosition} = require "./util"
+{extend, localPosition, updateElement} = require "./util"
 
 Line = require "./lib/line"
 Matrix = require "matrix"
 Point = require "point"
+
+autocrop = require "./autocrop"
 
 transformTool = (toolData, handler) ->
   state =
@@ -202,7 +204,7 @@ clipMask = (target, maskPath) ->
   ct.drawImage(target, 0, 0)
 
   c.matrix = matrix
-  c.style = matrix.toCSS3Transform()
+  autocrop(c)
   target.parentElement.appendChild(c)
 
   # Apply the negative
@@ -218,7 +220,7 @@ clipMask = (target, maskPath) ->
   ct.fillRect(0, 0, c.width, c.height)
 
   c.matrix = matrix
-  c.style = matrix.toCSS3Transform()
+  autocrop(c)
   target.parentElement.appendChild(c)
 
   # TODO: Autocrop whitespace
@@ -283,12 +285,6 @@ drawRect = (context, target) ->
   rectLines(target)
   .forEach (line) ->
     drawLine context, line
-
-updateElement = (element, matrix) ->
-  element.matrix = matrix
-  element.style = matrix.toCSS3Transform()
-
-  return element
 
 angleBetween = (a, b, origin=Point.ZERO) ->
   Point.direction(origin, b) - Point.direction(origin, a)
