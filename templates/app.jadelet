@@ -6,10 +6,10 @@ app
     - @tools.forEach (tool) ->
       = Tool tool, editor
   workspace
-    scene(drop=@workspaceDrop dragover=@workspaceDragover @mousedown @mousemove)
+    scene(@drop @dragover @mousedown @mousemove)
     = @screenElement
   tray
-    materials(dragstart=@materialDrag)
+    materials(@dragstart)
       = @images
     actions
       button(click=@render) Render

@@ -1,8 +1,6 @@
 Controls
 --------
 
-Knife Tool
-
 Send to Back/Send to Front/Move Up/Move Down
 
 Camera Tools
@@ -14,10 +12,6 @@ Pan
 
 Features
 --------
-
-Display Object Boundary on Hover
-
-Click Through Transparent
 
 Change Scene Size
 
@@ -41,6 +35,8 @@ Undo/Redo
 
 Image Filters
 
+Click Through Transparent
+
 Done
 ====
 
@@ -53,6 +49,8 @@ Rotate
 
 Scale
 
+Knife Tool
+
 
 Rendering
 ---------
@@ -64,6 +62,8 @@ Features
 --------
 
 Auto-crop
+
+Display Object Boundary on Hover
 
 Bugs
 ----

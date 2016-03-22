@@ -26,7 +26,19 @@ transformTool = (toolData, handler) ->
 
       return
 
-    mousemove: (e) ->
+    mousemove: (e, editor) ->
+      # Highlight Target Element
+      screen = editor.screenElement
+      context = editor.overlayContext()
+      context.clearRect(0, 0, screen.width, screen.height)
+
+      if state.activeElement
+        drawRect(context, state.activeElement)
+      else
+        target = e.target
+        if target.matrix
+          drawRect(context, target)
+
       return unless state.activeElement
 
       extend state,
@@ -274,11 +286,11 @@ rectLines = (target) ->
       start: currentPoint
       end: nextPoint
 
-drawLine = (context, line, color="orange") ->
+drawLine = (context, line, color="#8BF") ->
   context.beginPath()
   context.moveTo(line.start.x, line.start.y)
   context.lineTo(line.end.x, line.end.y)
-  context.lineWidth = 5
+  context.lineWidth = 2
   context.strokeStyle = color
   context.stroke()
 
