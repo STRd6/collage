@@ -29,7 +29,7 @@ resize = (canvas, bounds) ->
 
   canvas.getContext('2d').drawImage(spare, 0, 0)
 
-  updateElement canvas, Matrix.translate(x, y).concat(transform)
+  updateElement canvas, transform.concat Matrix.translate(x, y)
 
   return canvas
 

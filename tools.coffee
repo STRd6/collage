@@ -30,6 +30,7 @@ transformTool = (toolData, handler) ->
       return unless state.activeElement
 
       extend state,
+        event: e
         position: Point localPosition(e, false)
 
       transformation = handler(state)
@@ -64,11 +65,17 @@ module.exports = ->
   scale: transformTool
     name: "Scale"
     iconURL: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgOTkgOTkiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDk5IDk5OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBhdGggZD0iTTQxLjIsNjAuMmMtMC42LDAtMS4zLTAuMi0xLjctMC43Yy0xLTEtMS0yLjUsMC0zLjVjMS0xLDIuNi0xLDMuNi0wLjFjMSwxLDEsMi41LDAuMSwzLjRsLTAuMSwwLjEgIEM0Mi41LDYwLDQxLjgsNjAuMiw0MS4yLDYwLjJ6IE00Ni43LDU0LjdjLTAuNiwwLTEuMy0wLjItMS44LTAuN2MtMS0xLTEtMi41LDAtMy41bDAuMS0wLjFjMS0xLDIuNS0xLDMuNSwwYzEsMSwxLDIuNSwwLDMuNSAgTDQ4LjQsNTRDNDgsNTQuNSw0Ny4zLDU0LjcsNDYuNyw1NC43eiBNNTIuMiw0OS4yYy0wLjYsMC0xLjMtMC4yLTEuNy0wLjdjLTEtMS0xLTIuNSwwLTMuNWMxLTEsMi42LTEsMy42LTAuMWMxLDEsMSwyLjUsMC4xLDMuNCAgbC0wLjEsMC4xQzUzLjUsNDksNTIuOCw0OS4yLDUyLjIsNDkuMnogTTU3LjcsNDMuN2MtMC42LDAtMS4zLTAuMi0xLjctMC43Yy0xLTEtMS0yLjUsMC0zLjVjMS0xLDIuNi0xLDMuNi0wLjFjMSwxLDEsMi41LDAuMSwzLjQgIEw1OS41LDQzQzU5LDQzLjUsNTguMyw0My43LDU3LjcsNDMuN3oiPjwvcGF0aD48cGF0aCBkPSJNOTEuMiw1SDY2LjVjLTEuNiwwLTIuOCwxLjMtMi44LDIuOHMxLjMsMi44LDIuOCwyLjhoMTguM0w2NSwzMC41Yy0xLjEsMS4xLTEuMSwyLjksMCw0ICBjMC42LDAuNiwxLjMsMC44LDIsMC44YzAuNywwLDEuNS0wLjMsMi0wLjhsMTkuMy0xOS4zdjE3LjNjMCwxLjYsMS4zLDIuOCwyLjgsMi44YzEuNiwwLDIuOC0xLjMsMi44LTIuOFY3LjhDOTQsNi4zLDkyLjcsNSw5MS4yLDV6ICAiPjwvcGF0aD48cGF0aCBkPSJNMzIuNSw4OC4zSDE0LjJMMzQsNjguNWMxLjEtMS4xLDEuMS0yLjksMC00Yy0xLjEtMS4xLTIuOS0xLjEtNCwwTDEwLjcsODMuOFY2Ni41YzAtMS42LTEuMy0yLjgtMi44LTIuOCAgUzUsNjQuOSw1LDY2LjV2MjQuN0M1LDkyLjcsNi4zLDk0LDcuOCw5NGgyNC43YzEuNiwwLDIuOC0xLjMsMi44LTIuOFMzNC4xLDg4LjMsMzIuNSw4OC4zeiI+PC9wYXRoPjwvc3ZnPg=="
-  , ({position, originalPosition, midpoint}) ->
+  , ({event, position, originalPosition, midpoint}) ->
     {x:x1, y:y1} = originalPosition.subtract(midpoint)
     {x:x2, y:y2} = position.subtract(midpoint)
 
-    return Matrix.scale(x2 / x1, y2 / y1, midpoint)
+    xScale = x2 / x1
+    yScale = y2 / y1
+
+    if event.shiftKey
+      yScale = xScale = (xScale + yScale) / 2
+
+    return Matrix.scale(xScale, yScale, midpoint)
   autoCrop:
     name: "Autocrop"
     mousedown: (e) ->

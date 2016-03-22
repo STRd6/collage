@@ -25,8 +25,6 @@ imageUrls = [
   "https://2.pixiecdn.com/sprites/137922/original.png"
 ]
 
-screenElement = document.createElement('canvas')
-
 document.addEventListener 'mouseup', (e) ->
   e.preventDefault()
 
@@ -34,7 +32,7 @@ document.addEventListener 'mouseup', (e) ->
 
 app = self =
   activeTool: Observable(tools.move)
-  screenElement: screenElement
+  screenElement: document.createElement('canvas')
 
   tools: Observable ->
     Object.keys(tools).map (name) ->
@@ -127,7 +125,7 @@ document.body.appendChild Template app
 scene = document.querySelector("scene")
 
 setOverlaySize = ->
-  canvas = document.querySelector('canvas')
+  canvas = app.screenElement
 
   {width, height} = scene.getBoundingClientRect()
 

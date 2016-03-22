@@ -15,8 +15,6 @@ Pan
 Features
 --------
 
-Auto-crop Images
-
 Display Object Boundary on Hover
 
 Click Through Transparent
@@ -26,6 +24,10 @@ Change Scene Size
 Scene Background Color
 
 Warn when closing
+
+Drop Images to add to materials
+
+Load Materials from PixieEngine
 
 Bugs
 ----
@@ -60,3 +62,9 @@ Rendering
 ---------
 
 Export Scene
+
+
+Features
+--------
+
+Auto-crop
