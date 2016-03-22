@@ -10,20 +10,20 @@ module.exports = (canvas) ->
   console.log getContentBounds(imageData)
 
 getContentBounds = (imageData) ->
-  {width, height} = imageData
-  y = 0
-  x = 0
+  {data, width, height} = imageData
 
   xMin = Infinity
   yMin = Infinity
   xMax = -Infinity
   yMax = -Infinity
 
+  y = 0
   while y < height
+    x = 0
     while x < width
-      index = y * width + x + 3
-      
-      alpha = imageData[index]
+      index = (y * width + x) * 4 + 3
+
+      alpha = data[index]
       
       if alpha > 0
         if x < xMin
@@ -38,7 +38,7 @@ getContentBounds = (imageData) ->
       x += 1
     y += 1
 
-  x: xMin ? 0
-  y: yMin ? 0
-  width: (xMax - xMin) ? 0
-  height: (yMax - yMin) ? 0
+  x: xMin|0
+  y: yMin|0
+  width: (xMax - xMin)|0
+  height: (yMax - yMin)|0
