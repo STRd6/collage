@@ -4,7 +4,7 @@ module.exports = (tool, editor) ->
   ToolTemplate
     click: ->
       editor.activeTool tool
-  
+
     style: ->
       "background-image: url(#{tool.iconURL})"
 

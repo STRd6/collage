@@ -47,7 +47,7 @@ getContentBounds = (imageData) ->
       index = (y * width + x) * 4 + 3
 
       alpha = data[index]
-      
+
       if alpha > 0
         if x < xMin
           xMin = x
