@@ -3,11 +3,6 @@ Controls
 
 Send to Back/Send to Front/Move Up/Move Down
 
-Camera Tools
-------------
-
-Zoom
-
 Features
 --------
 
@@ -55,8 +50,11 @@ Rendering
 
 Export Scene
 
+
 Camera
 ------
+
+Zoom
 
 Pan
 

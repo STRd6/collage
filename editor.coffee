@@ -38,10 +38,14 @@ module.exports = ->
 
         return img
 
+    sceneWidth: -> 800
+    sceneHeight: -> 450
+
     render: ->
       scene = self.scene
 
-      {width, height} = scene.getBoundingClientRect()
+      height = self.sceneHeight()
+      width = self.sceneWidth()
 
       canvas = document.createElement("canvas")
       canvas.width = width

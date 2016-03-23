@@ -12,11 +12,24 @@ app
   height: 100%
 
   & > workspace
+    background-color: #EEE
     display: block
     flex-grow: 1
     height: 100%
     position: relative
     overflow: hidden
+
+    & > viewport
+      background-color: white
+      display: block
+      position: absolute
+      top: 0
+      bottom: 0
+      left: 0
+      right: 0
+      margin: auto
+      width: 800px
+      height: 450px
 
     & > scene
       display: block

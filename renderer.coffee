@@ -2,6 +2,7 @@ Matrix = require "matrix"
 
 module.exports = ->
   render: (context, scene) ->
+    # TODO: Add Viewport margin offset
     context.withTransform scene.matrix, (context) ->
       Array::forEach.call scene.children, (child) ->
         context.withTransform child.matrix, (context) ->
