@@ -8,8 +8,6 @@ Camera Tools
 
 Zoom
 
-Pan
-
 Features
 --------
 
@@ -56,6 +54,11 @@ Rendering
 ---------
 
 Export Scene
+
+Camera
+------
+
+Pan
 
 
 Features

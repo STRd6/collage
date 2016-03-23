@@ -1,4 +1,5 @@
 Editor = require "./editor"
+Matrix = require "matrix"
 Template = require "./templates/app"
 
 require "./lib/canvas-to-blob"
@@ -9,6 +10,8 @@ document.head.appendChild style
 
 editor = Editor()
 document.body.appendChild Template editor
+editor.scene = document.querySelector("scene")
+editor.scene.matrix = Matrix()
 
 global.PACKAGE = PACKAGE
 global.editor = editor
@@ -19,12 +22,10 @@ document.addEventListener 'mouseup', (e) ->
 
   editor.activeTool().mouseup(e, self)
 
-scene = document.querySelector("scene")
-
 setOverlaySize = ->
   canvas = editor.screenElement
 
-  {width, height} = scene.getBoundingClientRect()
+  {width, height} = editor.scene.getBoundingClientRect()
 
   canvas.width = width
   canvas.height = height

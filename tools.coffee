@@ -15,8 +15,8 @@ transformTool = (toolData, handler) ->
 
   extend toolData,
     mousedown: (e) ->
+      return unless validTarget(e)
       target = e.target
-      return if target is e.currentTarget
 
       extend state,
         activeElement: target
@@ -111,7 +111,7 @@ module.exports = ->
 
       if active
         # TODO: Should add all targets underneath this point, not just the top
-        if target != e.currentTarget
+        if validTarget(e)
           unless targetMap.has target
             targetMap.set target, []
 
@@ -192,12 +192,47 @@ module.exports = ->
         return
 
   pan: do ->
+    originalPosition = null
+    originalMatrix = null
+
     name: "Pan"
     iconURL: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTAwIDEwMCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBvbHlnb24gcG9pbnRzPSIyMi45MDMsNDUuNjg3IDE3LjQ2NCw0NS42ODcgMTcuNDY0LDM3LjYzMSA1LDUwLjA5OCAxNy40NjQsNjIuNTU4IDE3LjQ2NCw1NC40OTggMjIuOTAzLDU0LjQ5OCAiPjwvcG9seWdvbj48cG9seWdvbiBwb2ludHM9Ijc3LjA5Nyw1NC41MDQgODIuNTQzLDU0LjUwNCA4Mi41NDMsNjIuNTU4IDk1LDUwLjEwMSA4Mi41NDMsMzcuNjMxIDgyLjU0Myw0NS42OTQgNzcuMDk3LDQ1LjY5NCAiPjwvcG9seWdvbj48cG9seWdvbiBwb2ludHM9IjU0LjQwMywyNy41OTIgNTQuNDAzLDIyLjE1MyA2Mi40NjgsMjIuMTUzIDUwLjAwMyw5LjY4NSAzNy41MzksMjIuMTUzIDQ1LjU5MywyMi4xNTMgNDUuNTkzLDI3LjU5MiAiPjwvcG9seWdvbj48cG9seWdvbiBwb2ludHM9IjQ1LjU5Myw3Mi40MTkgNDUuNTkzLDc3Ljg1NiAzNy41MzksNzcuODU2IDUwLDkwLjMxNSA2Mi40NjgsNzcuODU2IDU0LjQwMyw3Ny44NTYgNTQuNDAzLDcyLjQxOSAiPjwvcG9seWdvbj48cGF0aCBkPSJNNjYuNzg2LDMxLjkxN0gzMy41NThjLTMuNDQ5LDAtNi4yNDgsMi43OTEtNi4yNDgsNi4yNDd2MjMuODYzYzAsMy40NTUsMi43OTksNi4yNSw2LjI0OCw2LjI1aDMzLjIyOCAgYzMuNDQ4LDAsNi4yNTEtMi43OTUsNi4yNTEtNi4yNVYzOC4xNjRDNzMuMDM3LDM0LjcwOCw3MC4yMzQsMzEuOTE3LDY2Ljc4NiwzMS45MTd6IE02Ni4zNDYsNjEuMjk0SDMzLjY1VjM4LjcxM2gzMi42OTVWNjEuMjk0eiI+PC9wYXRoPjxwb2x5Z29uIHBvaW50cz0iNTcuNDc5LDQ3Ljg5OSA1Mi4wOTcsNDcuODk5IDUyLjA5Nyw0Mi41MjEgNDcuOTAzLDQyLjUyMSA0Ny45MDMsNDcuODk5IDQyLjUyMSw0Ny44OTkgNDIuNTIxLDUyLjEgNDcuOTAzLDUyLjEgICA0Ny45MDMsNTcuNDc5IDUyLjA5Nyw1Ny40NzkgNTIuMDk3LDUyLjEgNTcuNDc5LDUyLjEgIj48L3BvbHlnb24+PC9zdmc+"
-    mousedown: ->
-      alert "TODO"
-    mousemove: ->
+    mousedown: (e, editor) ->
+      originalPosition = Point localPosition(e, false)
+      originalMatrix = editor.scene.matrix
+
+    mousemove: (e, editor) ->
+      return unless originalPosition
+
+      currentPosition = Point localPosition(e, false)
+      delta = currentPosition.subtract originalPosition
+      updateElement editor.scene, Matrix.translate(delta.x, delta.y).concat(originalMatrix)
+
     mouseup: ->
+      originalPosition = null
+  
+  zoom: do ->
+    originalPosition = null
+    originalMatrix = null
+
+    name: "Zoom"
+    iconURL: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTAwIDEwMCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBhdGggZD0iTTY2LjQsMzguNmMwLjUsMS4xLDAuNywyLjMsMC43LDMuNWMwLDAuNS0wLjIsMC45LTAuNSwxLjNjLTAuMywwLjMtMC44LDAuNS0xLjQsMC41Yy0wLjUsMC0wLjktMC4yLTEuMy0wLjUgIGMtMC4zLTAuNC0wLjUtMC44LTAuNS0xLjNjMC0xLjUtMC41LTIuOS0xLjYtMy45Yy0xLjEtMS4xLTIuNC0xLjYtMy45LTEuNmMtMC41LDAtMC45LTAuMi0xLjMtMC41Yy0wLjMtMC4zLTAuNS0wLjgtMC41LTEuMyAgYzAtMC41LDAuMi0xLDAuNS0xLjNjMC4zLTAuMywwLjgtMC41LDEuMy0wLjVjMS4zLDAsMi41LDAuMiwzLjYsMC43YzEuMSwwLjUsMi4xLDEuMSwyLjksMkM2NS4yLDM2LjUsNjUuOSwzNy40LDY2LjQsMzguNnogICBNNzcuMiwzNS44Yy0xLjMtMi45LTMtNS41LTUuMi03LjdjLTIuMi0yLjItNC44LTMuOS03LjctNS4yYy0yLjktMS4zLTYuMS0xLjktOS40LTEuOWMtMy4zLDAtNi40LDAuNi05LjQsMS45ICBjLTIuOSwxLjMtNS41LDMtNy43LDUuMmMtMi4yLDIuMi00LDQuOC01LjIsNy43Yy0xLjMsMi45LTEuOSw2LjEtMS45LDkuNGMwLDIuNCwwLjMsNC43LDEsN2MwLjcsMi4zLDEuNyw0LjQsMyw2LjNsLTEzLDEzLjEgIGMtMC40LDAuNC0wLjcsMS0wLjcsMS43YzAsMC40LDAuMiwwLjksMC43LDEuNmMwLjQsMC43LDEsMS4zLDEuNiwxLjljMC43LDAuNiwxLjMsMS4yLDEuOSwxLjZjMC42LDAuNSwxLjIsMC43LDEuNiwwLjcgIGMwLjcsMCwxLjMtMC4yLDEuNy0wLjdsMTMuMS0xM2MyLDEuMyw0LjEsMi4zLDYuNCwzYzIuMywwLjcsNC42LDEsNi45LDFjMy4zLDAsNi41LTAuNiw5LjQtMS45YzIuOS0xLjMsNS41LTMsNy43LTUuMiAgYzIuMi0yLjIsNC00LjgsNS4yLTcuN2MxLjMtMi45LDEuOS02LjEsMS45LTkuNEM3OSw0MS44LDc4LjQsMzguNyw3Ny4yLDM1Ljh6IE03Mi43LDUyLjhjLTEsMi4zLTIuNCw0LjQtNC4yLDYuMSAgYy0xLjcsMS43LTMuOCwzLjEtNi4yLDQuMWMtMi40LDEtNC45LDEuNS03LjUsMS41UzQ5LjcsNjQsNDcuMyw2M2MtMi40LTEtNC40LTIuNC02LjEtNC4xYy0xLjgtMS43LTMuMS0zLjgtNC4yLTYuMSAgYy0xLTIuMy0xLjYtNC45LTEuNi03LjZjMC0yLjcsMC41LTUuMSwxLjYtNy41YzEtMi40LDIuNC00LjQsNC4yLTYuMmMxLjctMS44LDMuOC0zLjEsNi4xLTQuMmMyLjMtMSw0LjgtMS41LDcuNS0xLjUgIHM1LjIsMC41LDcuNSwxLjVjMi40LDEsNC40LDIuNCw2LjIsNC4yYzEuNywxLjgsMy4xLDMuOCw0LjIsNi4yYzEsMi4zLDEuNiw0LjgsMS42LDcuNUM3NC4yLDQ3LjksNzMuNyw1MC40LDcyLjcsNTIuOHogTTk0LjEsODkuMyAgYzAtMS44LDAtMy41LDAtNC42bDAtMTIuM0w3Mi40LDk0LjFoMjEuN1Y4OS4zeiBNNS45LDcyLjR2MjEuN2gyMS43TDUuOSw3Mi40eiBNMjcuNiw1LjlINS45djIxLjdMMjcuNiw1Ljl6IE05NC4xLDUuOUg3Mi40ICBsMjEuNywyMS43TDk0LjEsNS45eiI+PC9wYXRoPjwvc3ZnPg=="
+    mousedown: (e, editor) ->
+      originalPosition = Point localPosition(e, false)
+      originalMatrix = editor.scene.matrix
+
+    mousemove: (e, editor) ->
+      return unless originalPosition
+
+      currentPosition = Point localPosition(e, false)
+      delta = currentPosition.subtract originalPosition
+
+      scale = 1 + (delta.x - delta.y) / 256
+
+      updateElement editor.scene, Matrix.scale(scale).concat(originalMatrix)
+
+    mouseup: ->
+      originalPosition = null
 
 clipMask = (target, maskPath) ->
   width = target.naturalWidth
@@ -301,3 +336,6 @@ drawRect = (context, target) ->
 
 angleBetween = (a, b, origin=Point.ZERO) ->
   Point.direction(origin, b) - Point.direction(origin, a)
+
+validTarget = (e) ->
+  ["IMG", "CANVAS"].indexOf(e.target.nodeName) >= 0

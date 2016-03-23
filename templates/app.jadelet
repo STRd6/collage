@@ -5,8 +5,8 @@ app
   tools
     - @tools.forEach (tool) ->
       = Tool tool, editor
-  workspace
-    scene(@drop @dragover @mousedown @mousemove)
+  workspace(@drop @dragover @mousedown @mousemove)
+    scene
     = @screenElement
   tray
     materials(@dragstart)

@@ -39,7 +39,8 @@ module.exports = ->
         return img
 
     render: ->
-      scene = document.querySelector "scene"
+      scene = self.scene
+
       {width, height} = scene.getBoundingClientRect()
 
       canvas = document.createElement("canvas")
@@ -108,4 +109,4 @@ module.exports = ->
       img.src = data.src
 
       updateElement img, Matrix.translate(x, y)
-      e.currentTarget.appendChild img
+      editor.scene.appendChild img
