@@ -47,6 +47,10 @@ module.exports = ->
       height = self.sceneHeight()
       width = self.sceneWidth()
 
+      viewRect = document.querySelector('viewport').getBoundingClientRect()
+      workRect = document.querySelector('workspace').getBoundingClientRect()
+      view = Matrix.translate(viewRect.left - workRect.left, viewRect.top - workRect.top)
+
       canvas = document.createElement("canvas")
       canvas.width = width
       canvas.height = height
@@ -54,7 +58,8 @@ module.exports = ->
       context = canvas.getContext("2d")
 
       context.clearRect(0, 0, canvas.width, canvas.height)
-      renderer.render(context, scene)
+      context.withTransform view.inverse(), (context) ->
+        renderer.render(context, scene)
       console.log canvas.toBlob (blob) ->
         url = URL.createObjectURL(blob)
         console.log url
