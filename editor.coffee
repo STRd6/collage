@@ -99,7 +99,7 @@ module.exports = ->
 
       data = JSON.parse dataText
 
-      {x, y} = localPosition(e, false)
+      {x, y} = self.scene.matrix.inverse().transformPoint localPosition(e, false)
 
       x -= data.offset.x
       y -= data.offset.y

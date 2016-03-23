@@ -14,36 +14,41 @@ transformTool = (toolData, handler) ->
     midpoint: null
 
   extend toolData,
-    mousedown: (e) ->
-      return unless validTarget(e)
+    mousedown: (e, editor) ->
+      return unless validTarget(e.target)
       target = e.target
+      viewMatrix = editor.scene.matrix.inverse()
 
       extend state,
         activeElement: target
         midpoint: getMidpoint(target)
         originalMatrix: target.matrix
-        originalPosition: Point localPosition(e, false)
+        originalPosition: viewMatrix.transformPoint localPosition(e, false)
 
       return
 
     mousemove: (e, editor) ->
+      viewMatrix = editor.scene.matrix.inverse()
+
       # Highlight Target Element
       screen = editor.screenElement
       context = editor.overlayContext()
       context.clearRect(0, 0, screen.width, screen.height)
 
       if state.activeElement
-        drawRect(context, state.activeElement)
+        target = state.activeElement
       else
         target = e.target
-        if target.matrix
+
+      if validTarget(target)
+        context.withTransform editor.scene.matrix, (context) ->
           drawRect(context, target)
 
       return unless state.activeElement
 
       extend state,
         event: e
-        position: Point localPosition(e, false)
+        position: viewMatrix.transformPoint localPosition(e, false)
 
       transformation = handler(state)
 
@@ -111,7 +116,7 @@ module.exports = ->
 
       if active
         # TODO: Should add all targets underneath this point, not just the top
-        if validTarget(e)
+        if validTarget(e.target)
           unless targetMap.has target
             targetMap.set target, []
 
@@ -227,9 +232,9 @@ module.exports = ->
       currentPosition = Point localPosition(e, false)
       delta = currentPosition.subtract originalPosition
 
-      scale = 1 + (delta.x - delta.y) / 256
+      scale = 1 + (delta.x - delta.y) / (256 * originalMatrix.a)
 
-      updateElement editor.scene, Matrix.scale(scale).concat(originalMatrix)
+      updateElement editor.scene, Matrix.scale(scale, scale, originalPosition).concat(originalMatrix)
 
     mouseup: ->
       originalPosition = null
@@ -337,5 +342,5 @@ drawRect = (context, target) ->
 angleBetween = (a, b, origin=Point.ZERO) ->
   Point.direction(origin, b) - Point.direction(origin, a)
 
-validTarget = (e) ->
-  ["IMG", "CANVAS"].indexOf(e.target.nodeName) >= 0
+validTarget = (target) ->
+  ["IMG", "CANVAS"].indexOf(target.nodeName) >= 0
