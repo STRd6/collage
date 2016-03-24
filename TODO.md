@@ -3,10 +3,10 @@ Controls
 
 Send to Back/Send to Front/Move Up/Move Down
 
+Text Tool
+
 Features
 --------
-
-Change Scene Size
 
 Scene Background Color
 
@@ -21,6 +21,12 @@ Bugs
 
 To Later
 --------
+
+Paint Tool
+
+Eraser Tool
+
+Integrate Pixel Editor
 
 Grouping
 
@@ -61,6 +67,8 @@ Pan
 
 Features
 --------
+
+Change Scene Size
 
 Auto-crop
 

@@ -1,0 +1,9 @@
+#options
+  h1 Screen
+  label
+    h2 Width
+    input(type="number" value=@sceneWidth)
+
+  label
+    h2 Height
+    input(type="number" value=@sceneHeight)

@@ -1,5 +1,6 @@
 Editor = require "./editor"
 Matrix = require "matrix"
+Observable = require "observable"
 Template = require "./templates/app"
 
 require "./lib/canvas-to-blob"
@@ -17,6 +18,13 @@ global.PACKAGE = PACKAGE
 global.editor = editor
 global.require = require
 
+sceneSize = Observable ->
+  [editor.sceneWidth(), editor.sceneHeight()]
+
+sceneSize.observe ([width, height]) ->
+  area = document.querySelector('render-area')
+  area.style = "width: #{width}px; height: #{height}px"
+
 document.addEventListener 'mouseup', (e) ->
   e.preventDefault()
 
@@ -25,7 +33,7 @@ document.addEventListener 'mouseup', (e) ->
 setOverlaySize = ->
   canvas = editor.screenElement
 
-  {width, height} = editor.scene.getBoundingClientRect()
+  {width, height} = document.querySelector("workspace").getBoundingClientRect()
 
   canvas.width = width
   canvas.height = height

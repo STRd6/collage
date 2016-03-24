@@ -1,5 +1,6 @@
 dependencies:
   bindable: "distri/bindable:v0.2.0"
   matrix: "distri/matrix:master"
+  modal: "distri/modal:v0.1.0"
   observable: "distri/observable:master"
   point: "distri/point:master"

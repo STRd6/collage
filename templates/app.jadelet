@@ -6,12 +6,12 @@ app
     - @tools.forEach (tool) ->
       = Tool tool, editor
   workspace(@drop @dragover @mousedown @mousemove)
-    viewport
+    render-area
     scene
     = @screenElement
   tray
     materials(@dragstart)
       = @images
     actions
-      button Options
+      button(click=@options) Options
       button(click=@render) Render

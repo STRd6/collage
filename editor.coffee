@@ -1,7 +1,10 @@
 Matrix = require "matrix"
+Modal = require "modal"
 Observable = require "observable"
 Renderer = require "./renderer"
 Tools = require("./tools")
+
+OptionsTemplate = require "./templates/options"
 
 {localPosition, updateElement} = require "./util"
 
@@ -38,8 +41,8 @@ module.exports = ->
 
         return img
 
-    sceneWidth: -> 800
-    sceneHeight: -> 450
+    sceneWidth: Observable 800
+    sceneHeight: Observable 450
 
     render: ->
       scene = self.scene
@@ -47,7 +50,7 @@ module.exports = ->
       height = self.sceneHeight()
       width = self.sceneWidth()
 
-      viewRect = document.querySelector('viewport').getBoundingClientRect()
+      viewRect = document.querySelector('render-area').getBoundingClientRect()
       workRect = document.querySelector('workspace').getBoundingClientRect()
       view = Matrix.translate(viewRect.left - workRect.left, viewRect.top - workRect.top)
 
@@ -64,6 +67,9 @@ module.exports = ->
         url = URL.createObjectURL(blob)
         console.log url
         window.open url
+
+    options: ->
+      Modal.show OptionsTemplate self
 
     dragstart: (e) ->
       sourceItem = e.target
