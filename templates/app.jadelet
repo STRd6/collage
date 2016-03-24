@@ -13,4 +13,5 @@ app
     materials(@dragstart)
       = @images
     actions
+      button Options
       button(click=@render) Render

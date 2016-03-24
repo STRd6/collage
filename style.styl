@@ -74,14 +74,17 @@ app
 
   & > tray
     border-left: 1px solid #AAA
+    display: flex
+    flex-direction: column
     flex-grow: 0
     width: 129px
     height: 100%
 
     & > actions
       display: block
-      position: absolute
-      bottom: 0
+
+      & > button
+        width: 100%
 
     & > materials
       background-color: #666
