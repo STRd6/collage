@@ -41,8 +41,7 @@ transformTool = (toolData, handler) ->
         target = e.target
 
       if validTarget(target)
-        context.withTransform editor.scene.matrix, (context) ->
-          drawRect(context, target)
+        drawRect(context, target, editor.scene.matrix)
 
       return unless state.activeElement
 
@@ -104,14 +103,17 @@ module.exports = ->
     name: "Cut"
     iconURL: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAA6lJREFUeJzt3E2KHHUAxuHX6FLU6MqtG4MLQSe5hCJuXZmPA0TwKCa4Eg/gBVS8gaAHUHDj2g8Ql34snE5qJvX2TE9XVazu54GGWdQ0/Yf6wUv39CQAAAAAAAAAAAAAAADM5LUk1572i4D/o7eT/Jrk84gEztjE8c/pQyRw6nwcIoFTLQ6RcPQuikMkHK3LxiESjs6ucYiEo3HVOETCwds3DpFwsKaKQyQcnKnj2Dw+W/IQMIe54vg7yb0FzwGTEwcU4oBCHFCIAwpxQCEOKMQBhTigEAcU4oBCHFCIAwpxQCEOKMQBhTigEAcU4oBCHFCIAwpxQCEOKMQBhTigEAcU4oBCHFCIAwpxQCEOKMQBxZxx3F3wHDA5cUAhDijEAYU4oBAHFOKAQhxQiAMKcUAhDijEAYU4oBAHFOKAQhxQiAMKcUAhDijEAYU4oBAHFOKAQhxQiAMKcUAhDijEAYU4oBAHFOKAQhxQiAOKOeO4s9wxYHrigEIcUIgDCnFAIQ4oxAGFOKAQBxTigEIcUIgDCnFAIQ4oxAGFOKAQBxTigEIcUIgDCnFAIQ4oxAGFOKAQBxTigEIcUIgDCnFAIQ4oxAGFOKAQBxRzxnF7wXPA5MQBhTigEAcU4oBCHFCIAwpxQCEOKMQBhTigEAcU4oBCHFCIAwpxQCEOKMQBhTigEAcU4oDizYgDqpeTfB9xwBkvDX6eMhJxsHq3kvySszfyFJGIg9W7leT3jN/Q+0QiDlZvGMfwxr4zuOYqkYiD1RuLY1sk35VrxcHB2RbHPpGIg9W7TBzDG/7u4He3RSIOVm+XOHaJRBys3s3sHkeL5HoeRyIOVm+fOIaR3Bs85/Uk30YcrNwUcbRInlvkBDCTKeNokcAqzRHHn0k+TfLGgueAyU0dx09JPs7ZP2iEVZoyjm+SvJfk2UVPADO5meS3TD+jnk/yzCIngJnsG8fYjLqR5JMk7y9yApjJPnGcn1HXkryb5OskfyX5cKlDwByuEsfYjHoxyUdJfszjt3NvL3ICmMmucbQZ9TDJH+eu+2CRE8BMdomjzaivLrgOVukkF8dxmRnlwz8OzkVx7DKjfPjHQdkWx9iMeidmFEdiLA4zCvJkHGPz6PUkD2JGcWSGcZhRMHCS5Oc8OY9eSHI/ZhRH7JX89z1wMwq22MyoL2NGwSObGfVDzCh4xIyCEW/FjIJRw/94aEbBwOY75GYUnHOS5IuYUTDq1af9AgAAAAAAAAAAAAAAAMi/0aQPy7R/vZsAAAAASUVORK5CYII="
     mousedown: (e, editor) ->
+      viewMatrix = editor.scene.matrix.inverse()
+
       active = true
       targetMap = new Map
       canvas = editor.screenElement
       context = canvas.getContext('2d')
 
-      path = [Point localPosition(e, false)]
+      path = [viewMatrix.transformPoint localPosition(e, false)]
 
     mousemove: (e, editor) ->
+      viewMatrix = editor.scene.matrix.inverse()
       target = e.target
 
       if active
@@ -120,23 +122,23 @@ module.exports = ->
           unless targetMap.has target
             targetMap.set target, []
 
-            drawRect(context, target)
+            drawRect(context, target, editor.scene.matrix)
 
         prev = path[path.length - 1]
-        current = Point localPosition(e, false)
+        current = viewMatrix.transformPoint localPosition(e, false)
 
         line = Line
           start: prev
           end: current
 
-        drawLine context, line, "purple"
+        drawLine context, line, "purple", editor.scene.matrix
 
         targetMap.forEach (intersections, target) ->
           rectLines(target).forEach (targetLine, i) ->
             intersection = line.intersects(targetLine)
 
             if intersection
-              drawCircle context, intersection
+              drawCircle context, intersection, editor.scene.matrix
 
               intersections.push [path.length, i]
               path.push intersection
@@ -297,7 +299,8 @@ getMidpoint = (target) ->
 
   target.matrix.transformPoint(Point(width/2, height/2))
 
-drawCircle = (context, p) ->
+drawCircle = (context, p, transform=Matrix.IDENTITY) ->
+  p = transform.transformPoint(p)
   context.beginPath()
   context.arc(p.x, p.y, 5, 0, 2*Math.PI)
   context.fillStyle = "magenta"
@@ -326,18 +329,21 @@ rectLines = (target) ->
       start: currentPoint
       end: nextPoint
 
-drawLine = (context, line, color="#8BF") ->
+drawLine = (context, line, color="#8BF", transform=Matrix.IDENTITY) ->
+  p1 = transform.transformPoint(line.start)
+  p2 = transform.transformPoint(line.end)
+
   context.beginPath()
-  context.moveTo(line.start.x, line.start.y)
-  context.lineTo(line.end.x, line.end.y)
+  context.moveTo(p1.x, p1.y)
+  context.lineTo(p2.x, p2.y)
   context.lineWidth = 2
   context.strokeStyle = color
   context.stroke()
 
-drawRect = (context, target) ->
+drawRect = (context, target, transform=Matrix.IDENTITY) ->
   rectLines(target)
   .forEach (line) ->
-    drawLine context, line
+    drawLine context, line, null, transform
 
 angleBetween = (a, b, origin=Point.ZERO) ->
   Point.direction(origin, b) - Point.direction(origin, a)
