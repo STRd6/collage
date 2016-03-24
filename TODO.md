@@ -1,8 +1,6 @@
 Controls
 --------
 
-Send to Back/Send to Front/Move Up/Move Down
-
 Text Tool
 
 Features
@@ -49,6 +47,8 @@ Rotate
 Scale
 
 Knife Tool
+
+Send to Back/Send to Front Move Up/Move Down
 
 
 Rendering

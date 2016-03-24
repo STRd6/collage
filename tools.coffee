@@ -30,18 +30,12 @@ transformTool = (toolData, handler) ->
     mousemove: (e, editor) ->
       viewMatrix = editor.scene.matrix.inverse()
 
-      # Highlight Target Element
-      screen = editor.screenElement
-      context = editor.overlayContext()
-      context.clearRect(0, 0, screen.width, screen.height)
-
       if state.activeElement
         target = state.activeElement
       else
         target = e.target
 
-      if validTarget(target)
-        drawRect(context, target, editor.scene.matrix)
+      hoverHighlight(target, editor)
 
       return unless state.activeElement
 
@@ -92,6 +86,51 @@ module.exports = ->
       yScale = xScale = (xScale + yScale) / 2
 
     return Matrix.scale(xScale, yScale, midpoint)
+
+  raise:
+    name: "Raise"
+    iconURL: "https://d30y9cdsu7xlg0.cloudfront.net/noun-svg/320166.svg?Expires=1458858515&Signature=hUb0f8uNFtTkpzdFWmOnIVe58cv2iPkUkM-xGrsOW5aF3lFKTp1eDbwauC~zGczlP9Eq-w37Qcbm8MwyyLQcx0XFSEvrCDfEHgW-Kt2i4kN-g8qHihxJLB6rQKok1hyf~X9UlTkIxfD8~5vr9LNNTmLlHO0MwltMhQF4HS4eyu8_&Key-Pair-Id=APKAI5ZVHAXN65CHVU2Q"
+    mousedown: (e, editor) ->
+      return unless validTarget(e.target)
+
+      target = e.target
+
+      if e.shiftKey # To the top
+        target.parentNode.appendChild target
+      else # Up one
+        referenceNode = target.nextSibling?.nextSibling
+  
+        if referenceNode
+          target.parentNode.insertBefore target, referenceNode
+        else
+          target.parentNode.appendChild target
+
+    mousemove: (e, editor) ->
+      hoverHighlight(e.target, editor)
+
+    mouseup: ->
+
+  lower:
+    name: "Lower"
+    iconURL: "https://d30y9cdsu7xlg0.cloudfront.net/noun-svg/320165.svg?Expires=1458858515&Signature=ZBnPvhqAeLCRXCLAZ9nu3~tT04pgctYuwQM1WdFnmdsQmgKlWvpqDZnKxXVeMmMR5GouE5vW5OMN9pBfqcTv4t8S47IusmVwIwd876cx3Y-71-KlHOXtLrZTyUbE0ve8TfIHS7l3mngLBYSmCyg2rzYe-iJAk6PJ58agpE5eT~Q_&Key-Pair-Id=APKAI5ZVHAXN65CHVU2Q"
+    mousedown: (e, editor) ->
+      return unless validTarget(e.target)
+
+      target = e.target
+
+      if e.shiftKey # To the bottom
+        referenceNode = target.parentNode.firstChild
+        target.parentNode.insertBefore target, referenceNode
+      else # Down one
+        referenceNode = target.previousSibling
+  
+        if referenceNode
+          target.parentNode.insertBefore target, referenceNode
+
+    mousemove: (e, editor) ->
+      hoverHighlight(e.target, editor)
+
+    mouseup: ->
 
   cut: do ->
     path = []
@@ -344,6 +383,15 @@ drawRect = (context, target, transform=Matrix.IDENTITY) ->
   rectLines(target)
   .forEach (line) ->
     drawLine context, line, null, transform
+
+hoverHighlight = (target, editor) ->
+  # Highlight Target Element
+  screen = editor.screenElement
+  context = editor.overlayContext()
+  context.clearRect(0, 0, screen.width, screen.height)
+
+  if validTarget(target)
+    drawRect(context, target, editor.scene.matrix)
 
 angleBetween = (a, b, origin=Point.ZERO) ->
   Point.direction(origin, b) - Point.direction(origin, a)
