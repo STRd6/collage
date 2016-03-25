@@ -1,12 +1,8 @@
 Controls
 --------
 
-Text Tool
-
 Features
 --------
-
-Scene Background Color
 
 Warn when closing
 
@@ -19,6 +15,8 @@ Bugs
 
 To Later
 --------
+
+Scene Background Color
 
 Paint Tool
 
@@ -39,6 +37,8 @@ Done
 
 Controls
 --------
+
+Text Tool
 
 Move
 

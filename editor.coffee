@@ -125,3 +125,7 @@ module.exports = ->
 
       updateElement img, Matrix.translate(x, y)
       editor.scene.appendChild img
+
+    addItem: (item, matrix=Matrix.IDENTITY) ->
+      updateElement item, matrix
+      editor.scene.appendChild item

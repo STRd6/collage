@@ -6,3 +6,4 @@ Pan By Aaron K. Kim thenounproject.com
 Zoom By mikael bonnevie thenounproject.com
 Bring To Front By Oliviu Stoian thenounproject.com
 Bring To Back By Oliviu Stoian thenounproject.com
+Text Box By icon 54 thenounproject.com
