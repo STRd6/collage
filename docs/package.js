@@ -199,7 +199,7 @@
     },
     "TODO.md": {
       "path": "TODO.md",
-      "content": "Controls\n--------\n\nFeatures\n--------\n\nWarn when closing\n\nLoad Materials from PixieEngine\n\nBugs\n----\n\nTo Later\n--------\n\nScene Background Color\n\nPaint Tool\n\nEraser Tool\n\nIntegrate Pixel Editor\n\nGrouping\n\nUndo/Redo\n\nImage Filters\n\nClick Through Transparent\n\nDone\n====\n\nControls\n--------\n\nText Tool\n\nMove\n\nRotate\n\nScale\n\nKnife Tool\n\nSend to Back/Send to Front Move Up/Move Down\n\n\nRendering\n---------\n\nExport Scene\n\n\nCamera\n------\n\nZoom\n\nPan\n\n\nFeatures\n--------\n\nDrop Images to add to materials\n\nChange Scene Size\n\nAuto-crop\n\nDisplay Object Boundary on Hover\n\nBugs\n----\n\nKnife tool doesn't get the right point when cutting from right edge of image\n",
+      "content": "Controls\n--------\n\nFeatures\n--------\n\nWarn when closing\n\nLoad Materials from PixieEngine\n\nPagination of Materials\n\nBugs\n----\n\nTo Later\n--------\n\nScene Background Color\n\nPaint Tool\n\nEraser Tool\n\nIntegrate Pixel Editor\n\nGrouping\n\nUndo/Redo\n\nImage Filters\n\nClick Through Transparent\n\nDone\n====\n\nControls\n--------\n\nText Tool\n\nMove\n\nRotate\n\nScale\n\nKnife Tool\n\nSend to Back/Send to Front Move Up/Move Down\n\n\nRendering\n---------\n\nExport Scene\n\n\nCamera\n------\n\nZoom\n\nPan\n\n\nFeatures\n--------\n\nDrop Images to add to materials\n\nChange Scene Size\n\nAuto-crop\n\nDisplay Object Boundary on Hover\n\nBugs\n----\n\nKnife tool doesn't get the right point when cutting from right edge of image\n",
       "mode": "100644",
       "type": "blob"
     },
