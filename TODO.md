@@ -8,6 +8,8 @@ Warn when closing
 
 Load Materials from PixieEngine
 
+Pagination of Materials
+
 Bugs
 ----
 
