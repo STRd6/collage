@@ -8,12 +8,18 @@ OptionsTemplate = require "./templates/options"
 
 {localPosition, updateElement} = require "./util"
 
-imageUrls = [
+images = [
   "https://0.pixiecdn.com/sprites/138612/original.png"
   "https://1.pixiecdn.com/sprites/141985/original."
   "https://3.pixiecdn.com/sprites/138119/original.png"
   "https://2.pixiecdn.com/sprites/137922/original.png"
-]
+].map (url) ->
+  img = new Image
+  img.crossOrigin = "Anonymous"
+  img.draggable = true
+  img.src = url + "?o_0"
+
+  return img
 
 module.exports = ->
   tools = Tools()
@@ -32,14 +38,15 @@ module.exports = ->
 
     unsaved: -> true
 
-    images: ->
-      imageUrls.map (url) ->
-        img = new Image
-        img.crossOrigin = "Anonymous"
-        img.draggable = true
-        img.src = url + "?o_0"
+    images: Observable(images)
+    
+    addMaterial: (url) ->
+      img = new Image
+      img.crossOrigin = "Anonymous"
+      img.draggable = true
+      img.src = url
 
-        return img
+      self.images.push img
 
     sceneWidth: Observable 800
     sceneHeight: Observable 450

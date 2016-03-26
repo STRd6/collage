@@ -6,8 +6,6 @@ Features
 
 Warn when closing
 
-Drop Images to add to materials
-
 Load Materials from PixieEngine
 
 Bugs
@@ -67,6 +65,8 @@ Pan
 
 Features
 --------
+
+Drop Images to add to materials
 
 Change Scene Size
 

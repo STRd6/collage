@@ -1,9 +1,15 @@
+Drop = require "./lib/drop"
 Editor = require "./editor"
 Matrix = require "matrix"
 Observable = require "observable"
 Template = require "./templates/app"
 
 require "./lib/canvas-to-blob"
+
+Drop document, (e) ->
+  Array::forEach.call event.dataTransfer.files, (file) ->
+    url = URL.createObjectURL(file)
+    editor.addMaterial(url)
 
 style = document.createElement "style"
 style.innerHTML = require "./style"
