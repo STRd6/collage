@@ -20,6 +20,15 @@ document.body.appendChild Template editor
 editor.scene = document.querySelector("scene")
 editor.scene.matrix = Matrix()
 
+fetch("https://api.pixieengine.com/sprites.json?per_page=20")
+.then (response) ->
+  response.json()
+.then (data) ->
+  editor.images data.map ({url}) ->
+    url += "?o_0"
+
+    editor.imageFromURL(url)
+
 global.PACKAGE = PACKAGE
 global.editor = editor
 global.require = require

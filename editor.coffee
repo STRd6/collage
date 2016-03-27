@@ -39,14 +39,19 @@ module.exports = ->
     unsaved: -> true
 
     images: Observable(images)
-    
+
     addMaterial: (url) ->
+      img = self.imageFromURL(url)
+
+      self.images.push img
+
+    imageFromURL: (url) ->
       img = new Image
       img.crossOrigin = "Anonymous"
       img.draggable = true
       img.src = url
 
-      self.images.push img
+      return img
 
     sceneWidth: Observable 800
     sceneHeight: Observable 450
