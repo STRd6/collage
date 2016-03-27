@@ -155,6 +155,19 @@ module.exports = ->
     mousemove: (e, editor) ->
     mouseup: (e, editor) ->
 
+  trash:
+    name: "Delete"
+    iconURL: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTAwIDEwMCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBhdGggZD0iTTMwLjEzNSw3NS4yMDZjMCwxLjk4OCwxLjYxNywzLjU5OSwzLjYxMSwzLjU5OWgzMi41MDhjMi4wMDIsMCwzLjYxOC0xLjYxLDMuNjE4LTMuNTk5VjM4LjE2NEgzMC4xMzVWNzUuMjA2eiAgIE01OC43OTgsNDEuNzMzaDUuNnYyOS45NTVjMCwxLjU0Ni0xLjI1NiwyLjc5Ni0yLjc5NSwyLjc5NmMtMS41NDksMC0yLjgwNC0xLjI1LTIuODA0LTIuNzk2VjQxLjczM3ogTTQ3LjIwNCw0MS43MzNoNS42MDR2MjkuOTU1ICBjMCwxLjU0Ni0xLjI1NCwyLjc5Ni0yLjgwMiwyLjc5NnMtMi44MDItMS4yNS0yLjgwMi0yLjc5NlY0MS43MzN6IE0zNS41MjcsNDEuNzMzaDUuNTk2djI5Ljk1NWMwLDEuNTQ2LTEuMjU1LDIuNzk2LTIuNzk4LDIuNzk2ICBzLTIuNzk3LTEuMjUtMi43OTctMi43OTZWNDEuNzMzeiI+PC9wYXRoPjxwYXRoIGQ9Ik02OS44NjQsMjUuMDQ2SDU1LjY4M3YtMi4wNTJjMCwwLTAuMDY0LTEuNzk5LTEuODctMS43OTloLTcuNzQ1Yy0xLjgwNCwwLTEuNzQyLDEuNzk5LTEuNzQyLDEuNzk5djIuMDUyaC0xNC4xOSAgYy0xLjk5MywwLTMuNjEyLDEuNjEzLTMuNjEyLDMuNjAxdjUuOTE5aDQ2Ljk1NHYtNS45MTlDNzMuNDc3LDI2LjY1OSw3MS44NTksMjUuMDQ2LDY5Ljg2NCwyNS4wNDZ6Ij48L3BhdGg+PC9zdmc+"
+    mousedown: (e, editor) ->
+      return unless validTarget(e.target)
+
+      e.target.remove()
+      clearScreen(editor)
+
+    mousemove: (e, editor) ->
+      hoverHighlight(e.target, editor)
+    mouseup: ->
+
   cut: do ->
     path = []
     active = false
@@ -406,6 +419,11 @@ drawRect = (context, target, transform=Matrix.IDENTITY) ->
   rectLines(target)
   .forEach (line) ->
     drawLine context, line, null, transform
+
+clearScreen = (editor) ->
+  screen = editor.screenElement
+  context = editor.overlayContext()
+  context.clearRect(0, 0, screen.width, screen.height)
 
 hoverHighlight = (target, editor) ->
   # Highlight Target Element
