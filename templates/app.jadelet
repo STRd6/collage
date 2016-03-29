@@ -14,4 +14,4 @@ app
       = @images
     actions
       button(click=@options) Options
-      button(click=@render) Render
+      button(click=@render) Publish

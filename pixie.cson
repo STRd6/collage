@@ -4,3 +4,4 @@ dependencies:
   modal: "distri/modal:v0.1.0"
   observable: "distri/observable:master"
   point: "distri/point:master"
+  postmaster: "distri/postmaster:v0.5.0"

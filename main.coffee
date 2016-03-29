@@ -20,6 +20,8 @@ document.body.appendChild Template editor
 editor.scene = document.querySelector("scene")
 editor.scene.matrix = Matrix()
 
+editor.invokeRemote "childLoaded"
+
 fetch("https://api.pixieengine.com/sprites.json?per_page=20")
 .then (response) ->
   response.json()
@@ -33,12 +35,14 @@ global.PACKAGE = PACKAGE
 global.editor = editor
 global.require = require
 
-sceneSize = Observable ->
-  [editor.sceneWidth(), editor.sceneHeight()]
-
-sceneSize.observe ([width, height]) ->
+updateSceneSize = ([width, height]) ->
   area = document.querySelector('render-area')
   area.style = "width: #{width}px; height: #{height}px"
+
+sceneSize = Observable ->
+  [editor.sceneWidth(), editor.sceneHeight()]
+sceneSize.observe updateSceneSize
+updateSceneSize(sceneSize())
 
 document.addEventListener 'mouseup', (e) ->
   e.preventDefault()

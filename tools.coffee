@@ -292,29 +292,7 @@ module.exports = ->
 
     mouseup: ->
       originalPosition = null
-  
-  zoom: do ->
-    originalPosition = null
-    originalMatrix = null
 
-    name: "Zoom"
-    iconURL: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTAwIDEwMCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBhdGggZD0iTTY2LjQsMzguNmMwLjUsMS4xLDAuNywyLjMsMC43LDMuNWMwLDAuNS0wLjIsMC45LTAuNSwxLjNjLTAuMywwLjMtMC44LDAuNS0xLjQsMC41Yy0wLjUsMC0wLjktMC4yLTEuMy0wLjUgIGMtMC4zLTAuNC0wLjUtMC44LTAuNS0xLjNjMC0xLjUtMC41LTIuOS0xLjYtMy45Yy0xLjEtMS4xLTIuNC0xLjYtMy45LTEuNmMtMC41LDAtMC45LTAuMi0xLjMtMC41Yy0wLjMtMC4zLTAuNS0wLjgtMC41LTEuMyAgYzAtMC41LDAuMi0xLDAuNS0xLjNjMC4zLTAuMywwLjgtMC41LDEuMy0wLjVjMS4zLDAsMi41LDAuMiwzLjYsMC43YzEuMSwwLjUsMi4xLDEuMSwyLjksMkM2NS4yLDM2LjUsNjUuOSwzNy40LDY2LjQsMzguNnogICBNNzcuMiwzNS44Yy0xLjMtMi45LTMtNS41LTUuMi03LjdjLTIuMi0yLjItNC44LTMuOS03LjctNS4yYy0yLjktMS4zLTYuMS0xLjktOS40LTEuOWMtMy4zLDAtNi40LDAuNi05LjQsMS45ICBjLTIuOSwxLjMtNS41LDMtNy43LDUuMmMtMi4yLDIuMi00LDQuOC01LjIsNy43Yy0xLjMsMi45LTEuOSw2LjEtMS45LDkuNGMwLDIuNCwwLjMsNC43LDEsN2MwLjcsMi4zLDEuNyw0LjQsMyw2LjNsLTEzLDEzLjEgIGMtMC40LDAuNC0wLjcsMS0wLjcsMS43YzAsMC40LDAuMiwwLjksMC43LDEuNmMwLjQsMC43LDEsMS4zLDEuNiwxLjljMC43LDAuNiwxLjMsMS4yLDEuOSwxLjZjMC42LDAuNSwxLjIsMC43LDEuNiwwLjcgIGMwLjcsMCwxLjMtMC4yLDEuNy0wLjdsMTMuMS0xM2MyLDEuMyw0LjEsMi4zLDYuNCwzYzIuMywwLjcsNC42LDEsNi45LDFjMy4zLDAsNi41LTAuNiw5LjQtMS45YzIuOS0xLjMsNS41LTMsNy43LTUuMiAgYzIuMi0yLjIsNC00LjgsNS4yLTcuN2MxLjMtMi45LDEuOS02LjEsMS45LTkuNEM3OSw0MS44LDc4LjQsMzguNyw3Ny4yLDM1Ljh6IE03Mi43LDUyLjhjLTEsMi4zLTIuNCw0LjQtNC4yLDYuMSAgYy0xLjcsMS43LTMuOCwzLjEtNi4yLDQuMWMtMi40LDEtNC45LDEuNS03LjUsMS41UzQ5LjcsNjQsNDcuMyw2M2MtMi40LTEtNC40LTIuNC02LjEtNC4xYy0xLjgtMS43LTMuMS0zLjgtNC4yLTYuMSAgYy0xLTIuMy0xLjYtNC45LTEuNi03LjZjMC0yLjcsMC41LTUuMSwxLjYtNy41YzEtMi40LDIuNC00LjQsNC4yLTYuMmMxLjctMS44LDMuOC0zLjEsNi4xLTQuMmMyLjMtMSw0LjgtMS41LDcuNS0xLjUgIHM1LjIsMC41LDcuNSwxLjVjMi40LDEsNC40LDIuNCw2LjIsNC4yYzEuNywxLjgsMy4xLDMuOCw0LjIsNi4yYzEsMi4zLDEuNiw0LjgsMS42LDcuNUM3NC4yLDQ3LjksNzMuNyw1MC40LDcyLjcsNTIuOHogTTk0LjEsODkuMyAgYzAtMS44LDAtMy41LDAtNC42bDAtMTIuM0w3Mi40LDk0LjFoMjEuN1Y4OS4zeiBNNS45LDcyLjR2MjEuN2gyMS43TDUuOSw3Mi40eiBNMjcuNiw1LjlINS45djIxLjdMMjcuNiw1Ljl6IE05NC4xLDUuOUg3Mi40ICBsMjEuNywyMS43TDk0LjEsNS45eiI+PC9wYXRoPjwvc3ZnPg=="
-    mousedown: (e, editor) ->
-      originalPosition = Point localPosition(e, false)
-      originalMatrix = editor.scene.matrix
-
-    mousemove: (e, editor) ->
-      return unless originalPosition
-
-      currentPosition = Point localPosition(e, false)
-      delta = currentPosition.subtract originalPosition
-
-      scale = 1 + (delta.x - delta.y) / (256 * originalMatrix.a)
-
-      updateElement editor.scene, Matrix.scale(scale, scale, originalPosition).concat(originalMatrix)
-
-    mouseup: ->
-      originalPosition = null
 
 clipMask = (target, maskPath) ->
   width = target.naturalWidth

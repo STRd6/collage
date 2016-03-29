@@ -1,6 +1,7 @@
 Matrix = require "matrix"
 Modal = require "modal"
 Observable = require "observable"
+Postmaster = require "postmaster"
 Renderer = require "./renderer"
 Tools = require("./tools")
 
@@ -36,7 +37,7 @@ module.exports = ->
       Object.keys(tools).map (name) ->
         tools[name]
 
-    unsaved: -> true
+    unsaved: Observable false
 
     images: Observable(images)
 
@@ -53,8 +54,8 @@ module.exports = ->
 
       return img
 
-    sceneWidth: Observable 800
-    sceneHeight: Observable 450
+    sceneWidth: Observable 400
+    sceneHeight: Observable 400
 
     render: ->
       scene = self.scene
@@ -75,10 +76,14 @@ module.exports = ->
       context.clearRect(0, 0, canvas.width, canvas.height)
       context.withTransform view.inverse(), (context) ->
         renderer.render(context, scene)
-      console.log canvas.toBlob (blob) ->
-        url = URL.createObjectURL(blob)
-        console.log url
-        window.open url
+
+      canvas.toBlob (blob) ->
+        self.unsaved false
+
+        self.invokeRemote "save",
+          image: blob
+          width: width
+          height: height
 
     options: ->
       Modal.show OptionsTemplate self
@@ -135,9 +140,18 @@ module.exports = ->
       img.crossOrigin = "Anonymous"
       img.src = data.src
 
-      updateElement img, Matrix.translate(x, y)
-      editor.scene.appendChild img
+      self.addItem img, Matrix.translate(x, y)
+
+      self.unsaved true
+
+      return
 
     addItem: (item, matrix=Matrix.IDENTITY) ->
       updateElement item, matrix
       editor.scene.appendChild item
+
+      return
+
+  Postmaster(self)
+
+  return self
