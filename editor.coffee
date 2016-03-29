@@ -142,13 +142,13 @@ module.exports = ->
 
       self.addItem img, Matrix.translate(x, y)
 
-      self.unsaved true
-
       return
 
     addItem: (item, matrix=Matrix.IDENTITY) ->
       updateElement item, matrix
-      editor.scene.appendChild item
+      self.scene.appendChild item
+
+      self.unsaved(true)
 
       return
 
