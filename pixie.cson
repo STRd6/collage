@@ -5,3 +5,6 @@ dependencies:
   observable: "distri/observable:master"
   point: "distri/point:master"
   postmaster: "distri/postmaster:v0.5.0"
+publish:
+  s3:
+    basePath: "public/danielx.net"
